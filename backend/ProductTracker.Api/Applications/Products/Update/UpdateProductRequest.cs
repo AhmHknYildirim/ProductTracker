@@ -1,4 +1,4 @@
-﻿namespace ProductTracker.Api.Application.Products.Update;
+﻿namespace ProductTracker.Api.Applications.Products.Update;
 
 public class UpdateProductRequest
 {

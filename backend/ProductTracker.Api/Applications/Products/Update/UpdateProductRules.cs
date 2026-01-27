@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductTracker.Api.Infrastructure.Persistence;
 
-namespace ProductTracker.Api.Application.Products.Update;
+namespace ProductTracker.Api.Applications.Products.Update;
 
 public sealed class UpdateProductRules
 {
@@ -15,10 +15,9 @@ public sealed class UpdateProductRules
             return;
 
         var normalized = sku.Trim();
-        
-        var exists = await _db.Products
-            .AnyAsync(x => x.Sku == normalized && x.Id != productId, ct);
-        
+
+        var exists = await _db.Products.AnyAsync(x => x.Sku == normalized && x.Id != productId, ct);
+
         if (exists)
             throw new InvalidOperationException($"SKU already exists: {normalized}");
     }

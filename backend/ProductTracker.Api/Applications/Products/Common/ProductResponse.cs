@@ -1,4 +1,4 @@
-﻿namespace ProductTracker.Api.Application.Products.Common;
+﻿namespace ProductTracker.Api.Applications.Products.Common;
 
 public sealed class ProductResponse
 {

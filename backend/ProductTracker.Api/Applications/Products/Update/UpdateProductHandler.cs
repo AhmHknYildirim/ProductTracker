@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using ProductTracker.Api.Application.Products.Common;
+using ProductTracker.Api.Applications.Products.Common;
 using ProductTracker.Api.Infrastructure.Persistence;
 
-namespace ProductTracker.Api.Application.Products.Update;
+namespace ProductTracker.Api.Applications.Products.Update;
+
 public sealed class UpdateProductHandler
 {
     private readonly AppDbContext _db;
@@ -13,19 +14,25 @@ public sealed class UpdateProductHandler
     public UpdateProductHandler(
         AppDbContext db,
         UpdateProductRules rules,
-        IValidator<UpdateProductRequest> validator)
+        IValidator<UpdateProductRequest> validator
+    )
     {
         _db = db;
         _rules = rules;
         _validator = validator;
     }
 
-    public async Task<ProductResponse> HandleAsync(Guid id, UpdateProductRequest request, CancellationToken ct = default)
+    public async Task<ProductResponse> HandleAsync(
+        Guid id,
+        UpdateProductRequest request,
+        CancellationToken ct = default
+    )
     {
         await _validator.ValidateAndThrowAsync(request, ct);
 
         var entity = await _db.Products.FindAsync([id], ct);
-        if (entity is null) throw new KeyNotFoundException("Product not found.");
+        if (entity is null)
+            throw new KeyNotFoundException("Product not found.");
 
         var normalizedSku = string.IsNullOrWhiteSpace(request.Sku) ? null : request.Sku.Trim();
 

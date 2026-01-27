@@ -1,4 +1,4 @@
-﻿namespace ProductTracker.Api.Application.Products.Create;
+﻿namespace ProductTracker.Api.Applications.Products.Create;
 
 public sealed class CreateProductRequest
 {

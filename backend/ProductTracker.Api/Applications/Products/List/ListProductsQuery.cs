@@ -1,4 +1,4 @@
-﻿namespace ProductTracker.Api.Application.Products.List;
+﻿namespace ProductTracker.Api.Applications.Products.List;
 
 public sealed class ListProductsQuery
 {

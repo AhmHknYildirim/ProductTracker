@@ -1,6 +1,6 @@
 ﻿using ProductTracker.Api.Domain.Entities;
 
-namespace ProductTracker.Api.Application.Products.Update;
+namespace ProductTracker.Api.Applications.Products.Update;
 
 public static class UpdateProductMapper
 {

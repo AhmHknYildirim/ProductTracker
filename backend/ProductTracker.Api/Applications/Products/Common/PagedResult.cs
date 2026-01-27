@@ -1,4 +1,4 @@
-﻿namespace ProductTracker.Api.Application.Common;
+﻿namespace ProductTracker.Api.Applications.Products.Common;
 
 public sealed class PagedResult<T>
 {

@@ -1,6 +1,14 @@
-import "./App.css";
-import { ProductsPage } from "./features/products/pages/ProductsPage";
+import { useState } from "react";
+import { getToken } from "./api/token";
+import AuthPage from "./features/auth/pages/AuthPage";
+import { HomePage } from "./features/home/pages/HomePage";
 
 export default function App() {
-    return <ProductsPage />;
+    const [authed, setAuthed] = useState(Boolean(getToken()));
+
+    if (!authed) {
+        return <AuthPage onSuccess={() => setAuthed(true)} />;
+    }
+
+    return <HomePage onLogout={() => setAuthed(false)} />;
 }
