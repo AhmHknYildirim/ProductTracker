@@ -11,6 +11,7 @@ public static class ProductResponseMapper
             Name = p.Name,
             Sku = p.Sku,
             Quantity = p.Quantity,
+            Status = (ProductStatusKind)p.StatusId,
             CreatedAt = p.CreatedAt,
         };
 }

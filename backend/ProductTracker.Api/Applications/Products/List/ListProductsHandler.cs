@@ -38,6 +38,10 @@ public sealed class ListProductsHandler
         if (query.MaxQty is not null)
             q = q.Where(x => x.Quantity <= query.MaxQty.Value);
 
+        var statusId = query.StatusId ?? (query.Status is not null ? (int)query.Status.Value : null);
+        if (statusId is not null)
+            q = q.Where(x => x.StatusId == statusId.Value);
+
         if (!string.IsNullOrWhiteSpace(query.Q))
         {
             var term = query.Q.Trim();

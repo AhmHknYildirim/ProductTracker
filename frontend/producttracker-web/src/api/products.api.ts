@@ -14,6 +14,8 @@ function toQueryString(q: ListProductsQuery): string {
     if (q.sku) params.set("sku", q.sku);
     if (q.minQty !== undefined) params.set("minQty", String(q.minQty));
     if (q.maxQty !== undefined) params.set("maxQty", String(q.maxQty));
+    if (q.status !== undefined) params.set("status", String(q.status));
+    if (q.statusId !== undefined) params.set("statusId", String(q.statusId));
     if (q.sort) params.set("sort", q.sort);
     if (q.page !== undefined) params.set("page", String(q.page));
     if (q.pageSize !== undefined) params.set("pageSize", String(q.pageSize));

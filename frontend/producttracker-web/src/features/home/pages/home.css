@@ -71,6 +71,13 @@
     background: rgba(255,255,255,0.03);
 }
 
+.home-tablabel {
+    padding: 10px 14px;
+    color: #fff;
+    font-weight: 800;
+    background: linear-gradient(135deg, rgba(79, 124, 255, 0.9), rgba(124, 58, 237, 0.85));
+}
+
 .home-tabs button {
     padding: 10px 14px;
     background: transparent;
@@ -162,7 +169,7 @@
 .home-filters .grid {
     display: grid;
     gap: 12px;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
 }
 
 .field label {
@@ -175,12 +182,14 @@
 .field input,
 .field select {
     width: 100%;
-    padding: 10px 12px;
+    min-width: 0;
+    padding: 12px 14px;
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.14);
     background: rgba(10, 15, 26, 0.55);
     color: #fff;
     outline: none;
+    box-sizing: border-box;
 }
 
 .field input:focus,
@@ -193,10 +202,76 @@
     margin-top: 12px;
     display: flex;
     gap: 10px;
+    justify-content: flex-end;
+}
+
+.home-filter-actions .home-btn {
+    padding: 6px 12px;
+    font-weight: 700;
+    border-radius: 10px;
 }
 
 .home-tablewrap {
     padding: 6px 10px 12px 10px;
+}
+
+.form-title {
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.stack {
+    display: grid;
+    gap: 12px;
+}
+
+.home-tableactions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px 6px 10px 6px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.7);
+    display: grid;
+    place-items: center;
+    z-index: 50;
+    padding: 20px;
+    backdrop-filter: blur(6px);
+}
+
+.modal-card {
+    width: min(480px, 92vw);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(10, 15, 26, 0.9);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.4);
+    padding: 16px;
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.form-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
 }
 
 .home-table {
@@ -245,9 +320,9 @@
     border: 1px solid rgba(255,255,255,0.12);
     background: rgba(255,255,255,0.05);
 }
-.pill.in { color: #b8ffd8; border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.10); }
-.pill.low { color: #ffe7b8; border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.10); }
-.pill.out { color: #ffd1d1; border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.10); }
+.pill.active { color: #b8ffd8; border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.10); }
+.pill.inactive { color: #ffe7b8; border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.10); }
+.pill.archived { color: #ffd1d1; border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.10); }
 
 .home-footer {
     padding: 12px 16px 16px 16px;
@@ -292,6 +367,18 @@
     }
 
     .home-filters .grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(5, minmax(160px, 1fr));
+        align-items: end;
+    }
+
+    .home-forms {
+        grid-template-columns: 1fr;
+    }
+
+    .form-card .grid {
         grid-template-columns: 1fr 1fr;
     }
 }
+

@@ -9,5 +9,6 @@ public static class UpdateProductMapper
         p.Name = req.Name.Trim();
         p.Sku = string.IsNullOrWhiteSpace(req.Sku) ? null : req.Sku.Trim();
         p.Quantity = req.Quantity;
+        p.StatusId = (int)req.Status;
     }
 }

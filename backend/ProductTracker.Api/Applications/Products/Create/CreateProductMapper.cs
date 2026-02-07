@@ -10,5 +10,6 @@ public static class CreateProductMapper
             Name = req.Name.Trim(),
             Sku = string.IsNullOrWhiteSpace(req.Sku) ? null : req.Sku.Trim(),
             Quantity = req.Quantity,
+            StatusId = (int)req.Status,
         };
 }
