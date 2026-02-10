@@ -1,4 +1,4 @@
-import { http } from "./http";
+﻿import { http } from "./http";
 import type {
     CreateProductRequest,
     ListProductsQuery,
@@ -36,4 +36,7 @@ export const productsApi = {
 
     update: (id: string, payload: UpdateProductRequest) =>
         http.put<ProductResponse>(`/api/products/${id}`, payload),
+
+    delete: (id: string) =>
+        http.delete<void>(`/api/products/${id}`),
 };

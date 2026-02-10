@@ -37,6 +37,7 @@ public sealed class UpdateProductHandler
         var normalizedSku = string.IsNullOrWhiteSpace(request.Sku) ? null : request.Sku.Trim();
 
         await _rules.EnsureSkuUniqueAsync(entity.Id, normalizedSku, ct);
+        await _rules.EnsureWareHouseExistsAsync(request.WareHouseId, ct);
 
         UpdateProductMapper.Apply(request, entity);
 

@@ -9,11 +9,31 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference
+      Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"
+      Version="8.0.10"
+    />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" PrivateAssets="all" />
+    <PackageReference
+      Include="Microsoft.EntityFrameworkCore.Design"
+      Version="8.0.11"
+      PrivateAssets="all"
+    />
+    <PackageReference
+      Include="Microsoft.EntityFrameworkCore.Tools"
+      Version="8.0.11"
+      PrivateAssets="all"
+    />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Applications\Stocks\Delete\" />
+    <Folder Include="Applications\Stocks\List\" />
+    <Folder Include="Applications\Stocks\Update\" />
+    <Folder Include="Applications\WareHouses\Create\" />
+    <Folder Include="Applications\WareHouses\Delete\" />
+    <Folder Include="Applications\WareHouses\List\" />
+    <Folder Include="Applications\WareHouses\Update\" />
   </ItemGroup>
 </Project>

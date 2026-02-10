@@ -71,13 +71,6 @@
     background: rgba(255,255,255,0.03);
 }
 
-.home-tablabel {
-    padding: 10px 14px;
-    color: #fff;
-    font-weight: 800;
-    background: linear-gradient(135deg, rgba(79, 124, 255, 0.9), rgba(124, 58, 237, 0.85));
-}
-
 .home-tabs button {
     padding: 10px 14px;
     background: transparent;
@@ -85,6 +78,9 @@
     border: none;
     cursor: pointer;
     font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .home-tabs button.active {
@@ -112,6 +108,10 @@
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--border);
     color: rgba(255,255,255,0.85);
+}
+
+.home-btn.danger {
+    background: var(--danger);
 }
 
 .home-btn:disabled {
@@ -215,6 +215,90 @@
     padding: 6px 10px 12px 10px;
 }
 
+.home-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.home-metric-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 14px;
+    background: rgba(255,255,255,0.04);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.home-metric-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.home-metric-title {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+}
+
+.home-metric-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.home-metric-chart {
+    flex: 1;
+}
+
+.home-metric-empty {
+    height: 260px;
+    border-radius: 12px;
+    border: 1px dashed rgba(255,255,255,0.12);
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.home-section {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    margin-top: 12px;
+}
+
+.home-section:first-child {
+    margin-top: 0;
+}
+
+.home-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.home-section-title {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+}
+
+.home-section-actions {
+    display: flex;
+    gap: 8px;
+}
+
 .form-title {
     font-weight: 900;
     font-size: 13px;
@@ -299,6 +383,79 @@
     font-weight: 800;
 }
 
+.home-row-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.home-row-actions.end {
+    justify-content: flex-end;
+}
+
+.home-row-actions .home-btn {
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.home-actions-cell {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+}
+
+.home-actions-trigger {
+    min-width: 110px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(10, 15, 26, 0.55);
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.home-actions-trigger:focus {
+    border-color: rgba(79, 124, 255, 0.7);
+    box-shadow: 0 0 0 4px rgba(79, 124, 255, 0.14);
+}
+
+.home-actions-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(10, 15, 26, 0.95);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    z-index: 5;
+    min-width: 140px;
+}
+
+.home-actions-item {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+}
+
+.home-actions-item.danger {
+    background: var(--danger);
+}
+
 .muted {
     color: var(--muted);
 }
@@ -379,6 +536,10 @@
 
     .form-card .grid {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .home-metrics-grid {
+        grid-template-columns: 1fr;
     }
 }
 

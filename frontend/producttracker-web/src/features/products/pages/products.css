@@ -1,0 +1,36 @@
+.products-page {
+    max-width: 900px;
+    margin: auto;
+}
+
+.create-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.create-form input {
+    padding: 8px;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table th,
+.products-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+}
+
+.actions {
+    display: flex;
+    gap: 6px;
+}
+
+.error {
+    background: #ffe3e3;
+    padding: 8px;
+    margin-bottom: 10px;
+}

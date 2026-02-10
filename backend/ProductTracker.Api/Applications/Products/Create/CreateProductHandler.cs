@@ -32,6 +32,7 @@ public sealed class CreateProductHandler
     {
         await _validator.ValidateAndThrowAsync(request, ct);
         await _rules.EnsureSkuUniqueAsync(request.Sku, ct);
+        await _rules.EnsureWareHouseExistsAsync(request.WareHouseId, ct);
 
         var userId = _currentUser.GetUserId();
 

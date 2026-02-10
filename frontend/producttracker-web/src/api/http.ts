@@ -21,14 +21,39 @@ async function request<T>(method: HttpMethod, path: string, body?: unknown): Pro
 
     if (!res.ok) {
         const text = await res.text();
+        let payload: unknown = null;
+        let message = text || `Request failed: ${res.status}`;
+
         try {
-            throw JSON.parse(text);
+            payload = JSON.parse(text);
+            if (typeof payload === "string") {
+                message = payload;
+            } else if (payload && typeof (payload as { message?: unknown }).message === "string") {
+                message = (payload as { message: string }).message;
+            }
         } catch {
-            throw new Error(text || `Request failed: ${res.status}`);
+            const match = text.match(/"message"\s*:\s*"([^"]+)"/);
+            if (match) {
+                message = match[1];
+            }
         }
+
+        const error = new Error(message);
+        (error as Error & { status?: number; payload?: unknown }).status = res.status;
+        (error as Error & { status?: number; payload?: unknown }).payload = payload;
+        throw error;
     }
 
-    return (await res.json()) as T;
+    if (res.status === 204) {
+        return undefined as T;
+    }
+
+    const bodyText = await res.text();
+    if (!bodyText) {
+        return undefined as T;
+    }
+
+    return JSON.parse(bodyText) as T;
 }
 
 export const http = {

@@ -9,7 +9,9 @@ public static class CreateProductMapper
         {
             Name = req.Name.Trim(),
             Sku = string.IsNullOrWhiteSpace(req.Sku) ? null : req.Sku.Trim(),
+            Revision = req.Revision.Trim(),
             Quantity = req.Quantity,
+            WareHouseId = req.WareHouseId,
             StatusId = (int)req.Status,
         };
 }

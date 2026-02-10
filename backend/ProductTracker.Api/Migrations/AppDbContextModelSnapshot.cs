@@ -31,6 +31,11 @@ namespace ProductTracker.Api.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -38,6 +43,11 @@ namespace ProductTracker.Api.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Revision")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Sku")
                         .HasMaxLength(64)
@@ -51,11 +61,16 @@ namespace ProductTracker.Api.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("WareHouseId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StatusId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("WareHouseId");
 
                     b.ToTable("products", (string)null);
                 });
@@ -90,6 +105,31 @@ namespace ProductTracker.Api.Migrations
                             Id = 2,
                             Name = "Archived"
                         });
+                });
+
+            modelBuilder.Entity("ProductTracker.Api.Domain.Entities.Stock", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("WareHouseId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "WareHouseId")
+                        .IsUnique();
+
+                    b.HasIndex("WareHouseId");
+
+                    b.ToTable("stocks", (string)null);
                 });
 
             modelBuilder.Entity("ProductTracker.Api.Domain.Entities.User", b =>
@@ -132,7 +172,23 @@ namespace ProductTracker.Api.Migrations
                     b.HasIndex("UserName")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("ProductTracker.Api.Domain.Entities.WareHouse", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("warehouses", (string)null);
                 });
 
             modelBuilder.Entity("ProductTracker.Api.Domain.Entities.Product", b =>
@@ -149,9 +205,35 @@ namespace ProductTracker.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProductTracker.Api.Domain.Entities.WareHouse", "WareHouse")
+                        .WithMany("Products")
+                        .HasForeignKey("WareHouseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Status");
 
                     b.Navigation("User");
+
+                    b.Navigation("WareHouse");
+                });
+
+            modelBuilder.Entity("ProductTracker.Api.Domain.Entities.Stock", b =>
+                {
+                    b.HasOne("ProductTracker.Api.Domain.Entities.Product", "Product")
+                        .WithMany("Stocks")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProductTracker.Api.Domain.Entities.WareHouse", "WareHouse")
+                        .WithMany("Stocks")
+                        .HasForeignKey("WareHouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("WareHouse");
                 });
 
             modelBuilder.Entity("ProductTracker.Api.Domain.Entities.ProductStatus", b =>
@@ -159,9 +241,21 @@ namespace ProductTracker.Api.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("ProductTracker.Api.Domain.Entities.Product", b =>
+                {
+                    b.Navigation("Stocks");
+                });
+
             modelBuilder.Entity("ProductTracker.Api.Domain.Entities.User", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("ProductTracker.Api.Domain.Entities.WareHouse", b =>
+                {
+                    b.Navigation("Products");
+
+                    b.Navigation("Stocks");
                 });
 #pragma warning restore 612, 618
         }

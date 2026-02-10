@@ -21,4 +21,14 @@ public sealed class UpdateProductRules
         if (exists)
             throw new InvalidOperationException($"SKU already exists: {normalized}");
     }
+
+    public async Task EnsureWareHouseExistsAsync(Guid? wareHouseId, CancellationToken ct)
+    {
+        if (wareHouseId is null)
+            return;
+
+        var exists = await _db.WareHouses.AnyAsync(x => x.Id == wareHouseId, ct);
+        if (!exists)
+            throw new InvalidOperationException("Warehouse not found.");
+    }
 }

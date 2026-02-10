@@ -3,13 +3,23 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProductTracker.Api.Applications.Metrics;
 using ProductTracker.Api.Applications.Products.Create;
+using ProductTracker.Api.Applications.Products.Delete;
 using ProductTracker.Api.Applications.Products.GetById;
 using ProductTracker.Api.Applications.Products.List;
 using ProductTracker.Api.Applications.Products.Update;
+using ProductTracker.Api.Applications.Stocks.Create;
+using ProductTracker.Api.Applications.Stocks.Delete;
+using ProductTracker.Api.Applications.Stocks.List;
+using ProductTracker.Api.Applications.Stocks.Update;
 using ProductTracker.Api.Applications.Users.Common;
 using ProductTracker.Api.Applications.Users.Login;
 using ProductTracker.Api.Applications.Users.Register;
+using ProductTracker.Api.Applications.WareHouses.Create;
+using ProductTracker.Api.Applications.WareHouses.Delete;
+using ProductTracker.Api.Applications.WareHouses.List;
+using ProductTracker.Api.Applications.WareHouses.Update;
 using ProductTracker.Api.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -84,6 +94,36 @@ builder.Services.AddScoped<UpdateProductHandler>();
 
 builder.Services.AddScoped<ListProductsHandler>();
 builder.Services.AddScoped<GetProductByIdHandler>();
+
+builder.Services.AddScoped<DeleteProductRules>();
+builder.Services.AddScoped<DeleteProductHandler>();
+
+builder.Services.AddScoped<MetricProductsQuantityHandler>();
+builder.Services.AddScoped<MetricWareHouseStockHandler>();
+
+// ---- Stocks ----
+builder.Services.AddScoped<CreateStockRules>();
+builder.Services.AddScoped<CreateStockHandler>();
+
+builder.Services.AddScoped<UpdateStockRules>();
+builder.Services.AddScoped<UpdateStockHandler>();
+
+builder.Services.AddScoped<ListStocksHandler>();
+
+builder.Services.AddScoped<DeleteStockRules>();
+builder.Services.AddScoped<DeleteStockHandler>();
+
+// ---- WareHouses ----
+builder.Services.AddScoped<CreateWareHouseRules>();
+builder.Services.AddScoped<CreateWareHouseHandler>();
+
+builder.Services.AddScoped<UpdateWareHouseRules>();
+builder.Services.AddScoped<UpdateWareHouseHandler>();
+
+builder.Services.AddScoped<ListWareHousesHandler>();
+
+builder.Services.AddScoped<DeleteWareHouseRules>();
+builder.Services.AddScoped<DeleteWareHouseHandler>();
 
 var app = builder.Build();
 

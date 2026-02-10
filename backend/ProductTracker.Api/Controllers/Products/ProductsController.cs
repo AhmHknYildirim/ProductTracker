@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductTracker.Api.Applications.Products.Create;
+using ProductTracker.Api.Applications.Products.Delete;
 using ProductTracker.Api.Applications.Products.GetById;
 using ProductTracker.Api.Applications.Products.List;
 using ProductTracker.Api.Applications.Products.Update;
+using ProductTracker.Api.Applications.Users.Common;
 
 namespace ProductTracker.Api.Controllers;
 
@@ -58,5 +60,18 @@ public sealed class ProductsController : ControllerBase
     {
         var result = await handler.HandleAsync(id, ct);
         return Ok(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(
+        Guid id,
+        [FromServices] DeleteProductHandler handler,
+        [FromServices] ICurrentUser currentUser,
+        CancellationToken ct
+    )
+    {
+        await handler.HandleAsync(new DeleteProductRequest { ProductId = id }, currentUser, ct);
+
+        return NoContent();
     }
 }
