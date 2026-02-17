@@ -1,0 +1,154 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap");
+
+:root {
+    --bg0: #f6f7fb;
+    --bg1: #ffffff;
+    --card: #ffffff;
+    --border: #e3e7ee;
+    --text: #111827;
+    --muted: #4b5563;
+    --accent: #1f5fa0;
+    --accent2: #2f7dd1;
+    --danger: #d64545;
+}
+
+body {
+    font-family: "Space Grotesk", "Segoe UI", sans-serif;
+    color: var(--text);
+}
+
+input,
+select,
+textarea {
+    color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(17, 24, 39, 0.5);
+}
+
+select option {
+    color: var(--text);
+}
+
+label {
+    color: #374151;
+}
+
+.home-root {
+    color: var(--text);
+    background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(47, 125, 209, 0.08), transparent 60%),
+        radial-gradient(900px 600px at 90% 15%, rgba(255, 199, 132, 0.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+}
+
+.home-topbar {
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.home-logo {
+    color: #fff;
+    background: linear-gradient(135deg, #1f5fa0, #2f7dd1);
+    box-shadow: 0 14px 40px rgba(31, 95, 160, 0.25);
+}
+
+.home-tabs {
+    background: #f3f5f8;
+}
+
+.home-tabs button {
+    color: #55616b;
+}
+
+.home-tabs button.active {
+    color: #fff;
+    background: linear-gradient(135deg, #1f5fa0, #2f7dd1);
+}
+
+.home-btn.ghost {
+    background: #f4f6f9;
+    border: 1px solid var(--border);
+    color: #1f2a30;
+}
+
+.home-panel,
+.home-metric-card,
+.home-section,
+.modal-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08);
+}
+
+.home-panel-head {
+    border-bottom: 1px solid var(--border);
+}
+
+.home-error {
+    background: #ffe9e9;
+    border: 1px solid #f5bcbc;
+    color: #7a1f1f;
+}
+
+.field input,
+.field select,
+.pagesize select,
+.home-actions-trigger,
+.home-inline-select {
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text);
+}
+
+.field input:focus,
+.field select:focus,
+.home-inline-select:focus,
+.home-actions-trigger:focus {
+    border-color: rgba(31, 95, 160, 0.55);
+    box-shadow: 0 0 0 4px rgba(31, 95, 160, 0.12);
+}
+
+.home-table th,
+.home-table td {
+    border-bottom: 1px solid var(--border);
+}
+
+.home-table th {
+    color: #6b7680;
+    background: #f3f5f8;
+}
+
+.modal-overlay {
+    background: rgba(9, 12, 20, 0.45);
+}
+
+.modal-card {
+    box-shadow: 0 28px 80px rgba(10, 20, 30, 0.22);
+}
+
+.pill {
+    border: 1px solid var(--border);
+    background: #f7f8fb;
+}
+
+.pill.active { color: #1b6d3c; }
+.pill.inactive { color: #8a5a12; }
+.pill.archived { color: #9b2c2c; }
+
+.home-actions-menu {
+    border: 1px solid var(--border);
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(15, 20, 30, 0.16);
+}
+
+.home-metric-empty {
+    border: 1px dashed #d6dde6;
+}
+
+.pager-info,
+.muted {
+    color: var(--muted);
+}

@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { productsApi } from "../../../api/products.api";
 import type { ListProductsQuery, ProductResponse } from "../../../types/product";
+import { TableCard } from "../../../ui/TableCard";
+import "./products.css";
+
+type CssVarStyle = CSSProperties & { [key: string]: string | number };
+
 export function ProductsPage() {
     const [items, setItems] = useState<ProductResponse[]>([]);
     const [total, setTotal] = useState(0);
@@ -18,6 +24,7 @@ export function ProductsPage() {
     const [editSku, setEditSku] = useState("");
     const [editRevision, setEditRevision] = useState("");
     const [editQuantity, setEditQuantity] = useState(0);
+
     const query: ListProductsQuery = useMemo(
         () => ({
             q: q || undefined,
@@ -27,6 +34,7 @@ export function ProductsPage() {
         }),
         [q, page]
     );
+
     async function load() {
         setLoading(true);
         setError(null);
@@ -40,9 +48,11 @@ export function ProductsPage() {
             setLoading(false);
         }
     }
+
     useEffect(() => {
         load();
     }, [query]);
+
     async function onCreate(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
@@ -63,6 +73,7 @@ export function ProductsPage() {
             setError(e?.message ?? "Create failed");
         }
     }
+
     async function onUpdate(id: string) {
         setError(null);
         try {
@@ -78,8 +89,9 @@ export function ProductsPage() {
             setError(e?.message ?? "Update failed");
         }
     }
+
     async function onDelete(id: string) {
-        if (!confirm("Bu �r�n� silmek istedi�inize emin misiniz?")) return;
+        if (!confirm("Bu urunu silmek istediginize emin misiniz?")) return;
         setError(null);
         try {
             await productsApi.delete(id);
@@ -88,6 +100,7 @@ export function ProductsPage() {
             setError(e?.message ?? "Delete failed");
         }
     }
+
     function startEdit(product: ProductResponse) {
         setEditingId(product.id);
         setEditName(product.name);
@@ -95,6 +108,7 @@ export function ProductsPage() {
         setEditRevision(product.revision ?? "");
         setEditQuantity(product.quantity);
     }
+
     function cancelEdit() {
         setEditingId(null);
         setEditName("");
@@ -102,6 +116,7 @@ export function ProductsPage() {
         setEditRevision("");
         setEditQuantity(0);
     }
+
     function handleActionChange(productId: string, action: string, product: ProductResponse) {
         if (action === "update") {
             startEdit(product);
@@ -109,41 +124,72 @@ export function ProductsPage() {
             onDelete(productId);
         }
     }
+
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const gridStyle: CssVarStyle = {
+        "--table-cols": "minmax(160px, 2fr) 1fr 1fr 0.7fr 1.2fr 0.7fr",
+    };
+
     return (
-        <div style={{ maxWidth: 900, margin: "24px auto", padding: 16, fontFamily: "system-ui" }}>
-            <h1 style={{ marginBottom: 12 }}>ProductTracker</h1>
-            <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
-                <input
-                    value={q}
-                    onChange={(e) => { setPage(1); setQ(e.target.value); }}
-                    placeholder="Search (name or sku)..."
-                    style={{ flex: 1, padding: 10, borderRadius: 10, border: "1px solid #ddd" }}
-                />
-                <button onClick={load} style={{ padding: "10px 14px", borderRadius: 10 }}>
+        <section className="prod-page">
+            <header className="prod-hero">
+                <div>
+                    <p className="prod-eyebrow">Inventory</p>
+                    <h1>Products</h1>
+                    <p className="prod-lead">
+                        Organize SKUs, track revisions, and keep product data consistent across
+                        procurement and stock.
+                    </p>
+                </div>
+                <div className="prod-kpis">
+                    <div className="prod-kpi">
+                        <span className="label">Total</span>
+                        <strong>{total}</strong>
+                        <span className="trend">All products</span>
+                    </div>
+                    <div className="prod-kpi">
+                        <span className="label">Page</span>
+                        <strong>{items.length}</strong>
+                        <span className="trend">Showing</span>
+                    </div>
+                </div>
+            </header>
+
+            <div className="prod-controls">
+                <div className="prod-search">
+                    <input
+                        value={q}
+                        onChange={(e) => {
+                            setPage(1);
+                            setQ(e.target.value);
+                        }}
+                        placeholder="Search by name or SKU"
+                        aria-label="Search products"
+                    />
+                    <span>?</span>
+                </div>
+                <button className="prod-btn ghost" type="button" onClick={load}>
                     Refresh
                 </button>
             </div>
-            <form onSubmit={onCreate} style={{ border: "1px solid #eee", borderRadius: 12, padding: 12, marginBottom: 16 }}>
-                <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
+
+            <form onSubmit={onCreate} className="prod-form">
+                <div className="prod-form-grid">
                     <input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Name"
-                        style={{ flex: 2, padding: 10, borderRadius: 10, border: "1px solid #ddd" }}
                         required
                     />
                     <input
                         value={sku}
                         onChange={(e) => setSku(e.target.value)}
                         placeholder="SKU (optional)"
-                        style={{ flex: 1, padding: 10, borderRadius: 10, border: "1px solid #ddd" }}
                     />
                     <input
                         value={revision}
                         onChange={(e) => setRevision(e.target.value)}
                         placeholder="Revision"
-                        style={{ flex: 1, padding: 10, borderRadius: 10, border: "1px solid #ddd" }}
                         required
                     />
                     <input
@@ -151,149 +197,133 @@ export function ProductsPage() {
                         value={quantity}
                         onChange={(e) => setQuantity(Number(e.target.value))}
                         placeholder="Qty"
-                        style={{ width: 120, padding: 10, borderRadius: 10, border: "1px solid #ddd" }}
                         min={0}
                     />
-                    <button type="submit" style={{ padding: "10px 14px", borderRadius: 10 }}>
+                    <button type="submit" className="prod-btn primary">
                         Add
                     </button>
                 </div>
             </form>
-            {error && (
-                <div style={{ background: "#ffe8e8", border: "1px solid #ffb3b3", padding: 12, borderRadius: 12, marginBottom: 12 }}>
-                    {error}
+
+            {error && <div className="prod-error">{error}</div>}
+
+            <TableCard
+                title="Products"
+                meta={`Total: ${total}`}
+            >
+                <div className="table-grid table-grid-head" style={gridStyle as CSSProperties}>
+                    <span>Name</span>
+                    <span>SKU</span>
+                    <span>Revision</span>
+                    <span className="table-grid-right">Qty</span>
+                    <span>Created</span>
+                    <span></span>
                 </div>
-            )}
-            <div style={{ border: "1px solid #eee", borderRadius: 12, overflow: "hidden" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <thead>
-                        <tr style={{ background: "#fafafa" }}>
-                            <th style={{ textAlign: "left", padding: 10 }}>Name</th>
-                            <th style={{ textAlign: "left", padding: 10 }}>SKU</th>
-                            <th style={{ textAlign: "left", padding: 10 }}>Revision</th>
-                            <th style={{ textAlign: "right", padding: 10 }}>Qty</th>
-                            <th style={{ textAlign: "left", padding: 10 }}>Created</th>
-                            <th style={{ textAlign: "center", padding: 10, width: 120 }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan={6} style={{ padding: 12 }}>Loading...</td></tr>
-                        ) : items.length === 0 ? (
-                            <tr><td colSpan={6} style={{ padding: 12 }}>No products</td></tr>
+
+                {loading && (
+                    <div className="table-grid table-grid-row table-grid-empty" style={gridStyle as CSSProperties}>
+                        <div>Loading...</div>
+                    </div>
+                )}
+
+                {!loading && items.length === 0 && (
+                    <div className="table-grid table-grid-row table-grid-empty" style={gridStyle as CSSProperties}>
+                        <div>No products found.</div>
+                    </div>
+                )}
+
+                {!loading &&
+                    items.map((p) =>
+                        editingId === p.id ? (
+                            <div key={p.id} className="table-grid table-grid-row" style={gridStyle as CSSProperties}>
+                                <input
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                />
+                                <input
+                                    value={editSku}
+                                    onChange={(e) => setEditSku(e.target.value)}
+                                />
+                                <input
+                                    value={editRevision}
+                                    onChange={(e) => setEditRevision(e.target.value)}
+                                />
+                                <input
+                                    type="number"
+                                    value={editQuantity}
+                                    onChange={(e) => setEditQuantity(Number(e.target.value))}
+                                    min={0}
+                                />
+                                <div className="table-grid-muted">
+                                    {new Date(p.createdAt).toLocaleString()}
+                                </div>
+                                <div className="prod-actions">
+                                    <button
+                                        type="button"
+                                        className="prod-btn primary small"
+                                        onClick={() => onUpdate(p.id)}
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="prod-btn ghost small"
+                                        onClick={cancelEdit}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
                         ) : (
-                            items.map((p) => (
-                                editingId === p.id ? (
-                                    <tr key={p.id} style={{ borderTop: "1px solid #f0f0f0", background: "#f9f9f9" }}>
-                                        <td style={{ padding: 10 }}>
-                                            <input
-                                                value={editName}
-                                                onChange={(e) => setEditName(e.target.value)}
-                                                style={{ width: "100%", padding: 6, borderRadius: 6, border: "1px solid #ddd" }}
-                                            />
-                                        </td>
-                                        <td style={{ padding: 10 }}>
-                                            <input
-                                                value={editSku}
-                                                onChange={(e) => setEditSku(e.target.value)}
-                                                style={{ width: "100%", padding: 6, borderRadius: 6, border: "1px solid #ddd" }}
-                                            />
-                                        </td>
-                                        <td style={{ padding: 10 }}>
-                                            <input
-                                                value={editRevision}
-                                                onChange={(e) => setEditRevision(e.target.value)}
-                                                style={{ width: "100%", padding: 6, borderRadius: 6, border: "1px solid #ddd" }}
-                                            />
-                                        </td>
-                                        <td style={{ padding: 10, textAlign: "right" }}>
-                                            <input
-                                                type="number"
-                                                value={editQuantity}
-                                                onChange={(e) => setEditQuantity(Number(e.target.value))}
-                                                style={{ width: "100%", padding: 6, borderRadius: 6, border: "1px solid #ddd", textAlign: "right" }}
-                                                min={0}
-                                            />
-                                        </td>
-                                        <td style={{ padding: 10 }}>{new Date(p.createdAt).toLocaleString()}</td>
-                                        <td style={{ padding: 10, textAlign: "center" }}>
-                                            <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
-                                                <button
-                                                    onClick={() => onUpdate(p.id)}
-                                                    style={{
-                                                        padding: "4px 10px",
-                                                        borderRadius: 6,
-                                                        background: "#4CAF50",
-                                                        color: "white",
-                                                        border: "none",
-                                                        cursor: "pointer",
-                                                        fontSize: 12
-                                                    }}
-                                                >
-                                                    ?
-                                                </button>
-                                                <button
-                                                    onClick={cancelEdit}
-                                                    style={{
-                                                        padding: "4px 10px",
-                                                        borderRadius: 6,
-                                                        background: "#f44336",
-                                                        color: "white",
-                                                        border: "none",
-                                                        cursor: "pointer",
-                                                        fontSize: 12
-                                                    }}
-                                                >
-                                                    ?
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    <tr key={p.id} style={{ borderTop: "1px solid #f0f0f0" }}>
-                                        <td style={{ padding: 10 }}>{p.name}</td>
-                                        <td style={{ padding: 10 }}>{p.sku ?? "-"}</td>
-                                        <td style={{ padding: 10 }}>{p.revision}</td>
-                                        <td style={{ padding: 10, textAlign: "right" }}>{p.quantity}</td>
-                                        <td style={{ padding: 10 }}>{new Date(p.createdAt).toLocaleString()}</td>
-                                        <td style={{ padding: 10, textAlign: "center" }}>
-                                            <select
-                                                value=""
-                                                onChange={(e) => handleActionChange(p.id, e.target.value, p)}
-                                                style={{
-                                                    padding: "6px 10px",
-                                                    borderRadius: 6,
-                                                    border: "1px solid #ddd",
-                                                    cursor: "pointer",
-                                                    fontSize: 14,
-                                                    background: "white"
-                                                }}
-                                            >
-                                                <option value="" disabled>Se�iniz</option>
-                                                <option value="update">G�ncelle</option>
-                                                <option value="delete">Sil</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                )
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, alignItems: "center" }}>
-                <span>
-                    Total: {total} � Page {page}/{totalPages}
+                            <div key={p.id} className="table-grid table-grid-row" style={gridStyle as CSSProperties}>
+                                <div className="table-grid-strong">{p.name}</div>
+                                <div>{p.sku ?? "-"}</div>
+                                <div>{p.revision}</div>
+                                <div className="table-grid-right">{p.quantity}</div>
+                                <div className="table-grid-muted">
+                                    {new Date(p.createdAt).toLocaleString()}
+                                </div>
+                                <div>
+                                    <select
+                                        className="prod-select"
+                                        value=""
+                                        onChange={(e) => handleActionChange(p.id, e.target.value, p)}
+                                    >
+                                        <option value="" disabled>
+                                            Seciniz
+                                        </option>
+                                        <option value="update">Guncelle</option>
+                                        <option value="delete">Sil</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )
+                    )}
+            </TableCard>
+
+            <div className="prod-footer">
+                <span className="prod-subtext">
+                    Total: {total} | Page {page}/{totalPages}
                 </span>
-                <div style={{ display: "flex", gap: 8 }}>
-                    <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                <div className="prod-pager">
+                    <button
+                        className="prod-btn ghost"
+                        disabled={page <= 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    >
                         Prev
                     </button>
-                    <button disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+                    <button
+                        className="prod-btn ghost"
+                        disabled={page >= totalPages}
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    >
                         Next
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }
+
+

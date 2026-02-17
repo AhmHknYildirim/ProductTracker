@@ -9,6 +9,9 @@ using ProductTracker.Api.Applications.Products.Delete;
 using ProductTracker.Api.Applications.Products.GetById;
 using ProductTracker.Api.Applications.Products.List;
 using ProductTracker.Api.Applications.Products.Update;
+using ProductTracker.Api.Applications.Procurements.PurchaseRequests.Create;
+using ProductTracker.Api.Applications.Procurements.PurchaseRequests.List;
+using ProductTracker.Api.Applications.Procurements.Units.List;
 using ProductTracker.Api.Applications.Stocks.Create;
 using ProductTracker.Api.Applications.Stocks.Delete;
 using ProductTracker.Api.Applications.Stocks.List;
@@ -124,6 +127,12 @@ builder.Services.AddScoped<ListWareHousesHandler>();
 
 builder.Services.AddScoped<DeleteWareHouseRules>();
 builder.Services.AddScoped<DeleteWareHouseHandler>();
+
+// ---- Procurements: Purchase Requests ----
+builder.Services.AddScoped<CreatePurchaseRequestRules>();
+builder.Services.AddScoped<CreatePurchaseRequestHandler>();
+builder.Services.AddScoped<ListPurchaseRequestsHandler>();
+builder.Services.AddScoped<ListUnitsHandler>();
 
 var app = builder.Build();
 

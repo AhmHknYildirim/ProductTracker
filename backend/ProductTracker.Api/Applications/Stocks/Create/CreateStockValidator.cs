@@ -8,6 +8,6 @@ public sealed class CreateStockValidator : AbstractValidator<CreateStockRequest>
     {
         RuleFor(x => x.ProductId).NotEmpty();
         RuleFor(x => x.WareHouseId).NotEmpty();
-        RuleFor(x => x.Quantity).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Quantity).GreaterThanOrEqualTo(0m);
     }
 }

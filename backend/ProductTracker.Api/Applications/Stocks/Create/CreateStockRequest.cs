@@ -4,5 +4,5 @@ public sealed class CreateStockRequest
 {
     public Guid ProductId { get; set; }
     public Guid WareHouseId { get; set; }
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
 }

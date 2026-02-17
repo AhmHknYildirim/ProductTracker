@@ -7,7 +7,7 @@ using ProductTracker.Api.Applications.Products.List;
 using ProductTracker.Api.Applications.Products.Update;
 using ProductTracker.Api.Applications.Users.Common;
 
-namespace ProductTracker.Api.Controllers;
+namespace ProductTracker.Api.Controllers.Products;
 
 [Authorize]
 [ApiController]

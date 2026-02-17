@@ -86,23 +86,23 @@ export function HomeDashboard() {
                             ) : (
                                 <ResponsiveContainer width="100%" height={260}>
                                     <BarChart data={productsData} barSize={20}>
-                                        <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" />
-                                        <XAxis dataKey="name" tick={{ fill: "rgba(255,255,255,0.7)", fontSize: 11 }} />
-                                        <YAxis tick={{ fill: "rgba(255,255,255,0.7)", fontSize: 11 }} />
+                                        <CartesianGrid stroke="rgba(108, 117, 125, 0.18)" strokeDasharray="4 4" />
+                                        <XAxis dataKey="name" tick={{ fill: "#6b7680", fontSize: 11 }} />
+                                        <YAxis tick={{ fill: "#6b7680", fontSize: 11 }} />
                                         <Tooltip
                                             contentStyle={{
-                                                background: "rgba(10, 15, 26, 0.95)",
-                                                border: "1px solid rgba(255,255,255,0.12)",
+                                                background: "#ffffff",
+                                                border: "1px solid #e3e7ee",
                                                 borderRadius: 12,
-                                                color: "#fff",
+                                                color: "#1c232b",
                                             }}
-                                            cursor={{ fill: "rgba(79,124,255,0.12)" }}
+                                            cursor={{ fill: "rgba(31, 95, 160, 0.08)" }}
                                         />
                                         <Bar dataKey="quantity" fill="url(#productGradient)" radius={[8, 8, 0, 0]} />
                                         <defs>
                                             <linearGradient id="productGradient" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.9} />
-                                                <stop offset="95%" stopColor="#4f7cff" stopOpacity={0.8} />
+                                                <stop offset="5%" stopColor="#1f5fa0" stopOpacity={0.9} />
+                                                <stop offset="95%" stopColor="#2f7dd1" stopOpacity={0.75} />
                                             </linearGradient>
                                         </defs>
                                     </BarChart>
@@ -124,19 +124,19 @@ export function HomeDashboard() {
                             ) : (
                                 <ResponsiveContainer width="100%" height={260}>
                                     <BarChart data={warehouseData} barSize={20}>
-                                        <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" />
-                                        <XAxis dataKey="name" tick={{ fill: "rgba(255,255,255,0.7)", fontSize: 11 }} />
-                                        <YAxis tick={{ fill: "rgba(255,255,255,0.7)", fontSize: 11 }} />
+                                        <CartesianGrid stroke="rgba(108, 117, 125, 0.18)" strokeDasharray="4 4" />
+                                        <XAxis dataKey="name" tick={{ fill: "#6b7680", fontSize: 11 }} />
+                                        <YAxis tick={{ fill: "#6b7680", fontSize: 11 }} />
                                         <Tooltip
                                             contentStyle={{
-                                                background: "rgba(10, 15, 26, 0.95)",
-                                                border: "1px solid rgba(255,255,255,0.12)",
+                                                background: "#ffffff",
+                                                border: "1px solid #e3e7ee",
                                                 borderRadius: 12,
-                                                color: "#fff",
+                                                color: "#1c232b",
                                             }}
-                                            cursor={{ fill: "rgba(16,185,129,0.12)" }}
+                                            cursor={{ fill: "rgba(46, 132, 98, 0.08)" }}
                                         />
-                                        <Bar dataKey="totalQuantity" fill="#10b981" radius={[8, 8, 0, 0]} />
+                                        <Bar dataKey="totalQuantity" fill="#2e8462" radius={[8, 8, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             )}

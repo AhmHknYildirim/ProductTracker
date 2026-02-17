@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { productsApi } from "../../../api/products.api";
 import { stocksApi } from "../../../api/stocks.api";
 import { warehousesApi } from "../../../api/warehouses.api";
@@ -6,8 +7,14 @@ import type { ProductResponse } from "../../../types/product";
 import type { StockResponse } from "../../../types/stock";
 import type { WareHouseResponse } from "../../../types/warehouse";
 import { ConfirmModal } from "../../../ui/ConfirmModal";
+import { TableCard } from "../../../ui/TableCard";
 import { useToast } from "../../../ui/ToastProvider";
 import "../../home/pages/home.css";
+import "./warehouses.css";
+
+type CssVarStyle = CSSProperties & { [key: string]: string | number };
+
+type StockEntry = StockResponse;
 
 export function WareHousesPage() {
     const { pushToast } = useToast();
@@ -27,6 +34,8 @@ export function WareHousesPage() {
     const [stockWarehouseId, setStockWarehouseId] = useState("");
     const [stockProductId, setStockProductId] = useState("");
     const [stockQty, setStockQty] = useState("0");
+    const [stockWarehouseFilter, setStockWarehouseFilter] = useState("");
+    const [stockProductFilter, setStockProductFilter] = useState("");
 
     const [confirmState, setConfirmState] = useState<{
         open: boolean;
@@ -35,14 +44,16 @@ export function WareHousesPage() {
         confirmLabel: string;
         cancelLabel: string;
         onConfirm: (() => void) | null;
-    }>({
-        open: false,
-        title: "",
-        message: "",
-        confirmLabel: "Confirm",
-        cancelLabel: "Cancel",
-        onConfirm: null,
-    });
+    }>(
+        {
+            open: false,
+            title: "",
+            message: "",
+            confirmLabel: "Confirm",
+            cancelLabel: "Cancel",
+            onConfirm: null,
+        }
+    );
 
     async function loadWarehouses() {
         setLoading(true);
@@ -312,128 +323,148 @@ export function WareHousesPage() {
         return [...products].sort((a, b) => a.name.localeCompare(b.name));
     }, [products]);
 
+    const filteredStocks = useMemo(() => {
+        return stocks.filter((stock) => {
+            if (stockWarehouseFilter && stock.warehouseId !== stockWarehouseFilter) {
+                return false;
+            }
+            if (stockProductFilter && stock.productId !== stockProductFilter) {
+                return false;
+            }
+            return true;
+        });
+    }, [stocks, stockWarehouseFilter, stockProductFilter]);
+
+    const warehouseGrid: CssVarStyle = {
+        "--table-cols": "minmax(180px, 2fr) 1fr",
+    };
+
+    const stockGrid: CssVarStyle = {
+        "--table-cols": "minmax(160px, 2fr) 1.4fr 1fr 0.6fr 1fr",
+    };
+
     return (
         <>
-            <div className="home-panel">
-                <div className="home-panel-head">
-                    <div className="home-panel-title">WareHouses</div>
-                    <div className="home-panel-meta">
-                        {loading ? "Loading..." : `${warehouses.length} warehouses â€¢ ${stocks.length} stocks`}
-                    </div>
+            <TableCard
+                title="WareHouses"
+                meta={loading ? "Loading..." : `${warehouses.length} warehouses • ${stocks.length} stocks`}
+                actions={
+                    <button className="wh-btn primary" type="button" onClick={openWarehouseCreate}>
+                        Add Warehouse
+                    </button>
+                }
+            >
+                <div className="table-grid table-grid-head" style={warehouseGrid as CSSProperties}>
+                    <span>Name</span>
+                    <span className="table-grid-right">Actions</span>
                 </div>
-
-                <div className="home-tablewrap">
-                    <div className="home-section">
-                        <div className="home-section-head">
-                            <div className="home-section-title">WareHouses</div>
-                            <div className="home-section-actions">
-                                <button className="home-btn" type="button" onClick={openWarehouseCreate}>
-                                    Add Warehouse
+                {warehouses.length === 0 ? (
+                    <div className="table-grid table-grid-row table-grid-empty" style={warehouseGrid as CSSProperties}>
+                        <div>No warehouses yet.</div>
+                    </div>
+                ) : (
+                    warehouses.map((warehouse) => (
+                        <div key={warehouse.id} className="table-grid table-grid-row" style={warehouseGrid as CSSProperties}>
+                            <div className="table-grid-strong">{warehouse.name}</div>
+                            <div className="table-grid-right wh-actions">
+                                <button className="wh-btn ghost" type="button" onClick={() => openWarehouseEdit(warehouse)}>
+                                    Edit
+                                </button>
+                                <button className="wh-btn danger" type="button" onClick={() => handleWarehouseDelete(warehouse.id)}>
+                                    Delete
                                 </button>
                             </div>
                         </div>
-                        <table className="home-table">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th style={{ textAlign: "right" }}>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {warehouses.length === 0 ? (
-                                <tr>
-                                    <td colSpan={2} className="empty">
-                                        No warehouses yet.
-                                    </td>
-                                </tr>
-                            ) : (
-                                warehouses.map((warehouse) => (
-                                    <tr key={warehouse.id}>
-                                        <td className="strong">{warehouse.name}</td>
-                                        <td style={{ textAlign: "right" }}>
-                                            <div className="home-row-actions end">
-                                                <button
-                                                    className="home-btn ghost"
-                                                    type="button"
-                                                    onClick={() => openWarehouseEdit(warehouse)}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    className="home-btn danger"
-                                                    type="button"
-                                                    onClick={() => handleWarehouseDelete(warehouse.id)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                            </tbody>
-                        </table>
-                    </div>
+                    ))
+                )}
+            </TableCard>
 
-                    <div className="home-section">
-                        <div className="home-section-head">
-                            <div className="home-section-title">Stock</div>
-                            <div className="home-section-actions">
-                                <button className="home-btn" type="button" onClick={openStockCreate}>
-                                    Add Stock
+            <div className="wh-spacer" />
+
+            <TableCard
+                title="Stock"
+                actions={
+                    <div className="wh-actions">
+                        <button
+                            className="wh-btn ghost"
+                            type="button"
+                            onClick={() => {
+                                setStockWarehouseFilter("");
+                                setStockProductFilter("");
+                            }}
+                        >
+                            Reset
+                        </button>
+                        <button className="wh-btn primary" type="button" onClick={openStockCreate}>
+                            Add Stock
+                        </button>
+                    </div>
+                }
+            >
+                <div className="wh-filters">
+                    <div className="wh-filter">
+                        <label>Warehouse</label>
+                        <select
+                            value={stockWarehouseFilter}
+                            onChange={(e) => setStockWarehouseFilter(e.target.value)}
+                            aria-label="Filter by warehouse"
+                        >
+                            <option value="">All warehouses</option>
+                            {warehouseOptions.map((warehouse) => (
+                                <option key={warehouse.id} value={warehouse.id}>
+                                    {warehouse.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="wh-filter">
+                        <label>Product</label>
+                        <select
+                            value={stockProductFilter}
+                            onChange={(e) => setStockProductFilter(e.target.value)}
+                            aria-label="Filter by product"
+                        >
+                            <option value="">All products</option>
+                            {productOptions.map((product) => (
+                                <option key={product.id} value={product.id}>
+                                    {product.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="table-grid table-grid-head" style={stockGrid as CSSProperties}>
+                    <span>WareHouse</span>
+                    <span>Product</span>
+                    <span>SKU</span>
+                    <span className="table-grid-right">Qty</span>
+                    <span>Actions</span>
+                </div>
+
+                {filteredStocks.length === 0 ? (
+                    <div className="table-grid table-grid-row table-grid-empty" style={stockGrid as CSSProperties}>
+                        <div>No stock records yet.</div>
+                    </div>
+                ) : (
+                    filteredStocks.map((stock) => (
+                        <div key={stock.id} className="table-grid table-grid-row" style={stockGrid as CSSProperties}>
+                            <div className="table-grid-strong">{stock.wareHouseName}</div>
+                            <div>{stock.productName}</div>
+                            <div className="table-grid-muted">{stock.productSku ?? "-"}</div>
+                            <div className="table-grid-right">{stock.quantity}</div>
+                            <div className="wh-actions">
+                                <button className="wh-btn ghost" type="button" onClick={() => openStockEdit(stock)}>
+                                    Edit
+                                </button>
+                                <button className="wh-btn danger" type="button" onClick={() => handleStockDelete(stock.id)}>
+                                    Delete
                                 </button>
                             </div>
                         </div>
-                        <table className="home-table">
-                            <thead>
-                            <tr>
-                                <th style={{ width: "25%" }}>WareHouse</th>
-                                <th style={{ width: "25%" }}>Product</th>
-                                <th style={{ width: "15%" }}>SKU</th>
-                                <th style={{ width: "10%" }}>Qty</th>
-                            <th style={{ width: "10%" }}>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {stocks.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="empty">
-                                    No stock records yet.
-                                </td>
-                            </tr>
-                        ) : (
-                            stocks.map((stock) => (
-                                <tr key={stock.id}>
-                                    <td className="strong">{stock.wareHouseName}</td>
-                                    <td>{stock.productName}</td>
-                                    <td className="muted">{stock.productSku ?? "-"}</td>
-                                    <td>{stock.quantity}</td>
-                                    <td>
-                                        <div className="home-row-actions">
-                                            <button
-                                                className="home-btn ghost"
-                                                type="button"
-                                                onClick={() => openStockEdit(stock)}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                className="home-btn danger"
-                                                type="button"
-                                                onClick={() => handleStockDelete(stock.id)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            </div>
+                    ))
+                )}
+            </TableCard>
 
             {showWarehouseCreate && (
                 <div className="modal-overlay" onClick={() => setShowWarehouseCreate(false)}>
@@ -536,22 +567,22 @@ export function WareHousesPage() {
                                         ))}
                                     </select>
                                 </div>
-                            <div className="field">
-                                <label>Quantity</label>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    value={stockQty}
-                                    onChange={(e) => setStockQty(e.target.value)}
-                                    placeholder="0"
-                                    required
-                                />
+                                <div className="field">
+                                    <label>Quantity</label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={stockQty}
+                                        onChange={(e) => setStockQty(e.target.value)}
+                                        placeholder="0"
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-actions">
-                            <button className="home-btn" type="submit">
-                                Create
-                            </button>
+                            <div className="form-actions">
+                                <button className="home-btn" type="submit">
+                                    Create
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -598,22 +629,22 @@ export function WareHousesPage() {
                                         ))}
                                     </select>
                                 </div>
-                            <div className="field">
-                                <label>Quantity</label>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    value={stockQty}
-                                    onChange={(e) => setStockQty(e.target.value)}
-                                    placeholder="0"
-                                    required
-                                />
+                                <div className="field">
+                                    <label>Quantity</label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={stockQty}
+                                        onChange={(e) => setStockQty(e.target.value)}
+                                        placeholder="0"
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-actions">
-                            <button className="home-btn" type="submit">
-                                Update
-                            </button>
+                            <div className="form-actions">
+                                <button className="home-btn" type="submit">
+                                    Update
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -634,3 +665,5 @@ export function WareHousesPage() {
         </>
     );
 }
+
+

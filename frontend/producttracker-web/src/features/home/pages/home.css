@@ -1,15 +1,14 @@
-﻿:root {
-    --bg0: #0b1020;
-    --bg1: #070b14;
-    --card: rgba(255, 255, 255, 0.06);
-    --border: rgba(255, 255, 255, 0.10);
-    --text: rgba(255, 255, 255, 0.92);
-    --muted: rgba(255, 255, 255, 0.65);
-    --accent: #4f7cff;
-    --accent2: #7c3aed;
-    --danger: #ff6b6b;
+:root {
+    --bg0: #f6f7fb;
+    --bg1: #ffffff;
+    --card: #ffffff;
+    --border: #e3e7ee;
+    --text: #1c232b;
+    --muted: #5c6770;
+    --accent: #1f5fa0;
+    --accent2: #2f7dd1;
+    --danger: #d64545;
 }
-
 .home-root {
     min-height: 100vh;
     color: var(--text);
@@ -64,7 +63,12 @@
 }
 
 .home-tabs {
-    display: inline-flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    width: 100%;
+    max-width: 760px;
+    gap: 8px;
+    padding: 6px;
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
@@ -81,6 +85,9 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+    text-align: center;
+    width: 100%;
+    border-radius: 30px;
 }
 
 .home-tabs button.active {
@@ -122,11 +129,12 @@
 .home-main {
     padding: 22px;
     display: grid;
-    place-items: start center;
+    place-items: start stretch;
 }
 
 .home-panel {
-    width: min(1100px, 96vw);
+    width: 100%;
+    max-width: none;
     border-radius: 16px;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.05);
@@ -200,9 +208,9 @@
 
 .home-filter-actions {
     margin-top: 12px;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 12px;
 }
 
 .home-filter-actions .home-btn {
@@ -297,6 +305,93 @@
 .home-section-actions {
     display: flex;
     gap: 8px;
+}
+
+.home-section-actions.stock-actions {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: end;
+}
+
+.home-inline-select {
+    min-width: 120px;
+    padding: 10px 34px 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background:
+        radial-gradient(120px 60px at 10% 10%, rgba(79, 124, 255, 0.18), transparent 60%),
+        linear-gradient(135deg, rgba(79, 124, 255, 0.08), rgba(124, 58, 237, 0.08)),
+        rgba(10, 15, 26, 0.7);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    appearance: none;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position:
+        left top,
+        left top,
+        left top,
+        calc(100% - 16px) 55%,
+        calc(100% - 11px) 55%;
+    background-size:
+        auto,
+        auto,
+        auto,
+        5px 5px,
+        5px 5px;
+    background-image:
+        radial-gradient(120px 60px at 10% 10%, rgba(79, 124, 255, 0.18), transparent 60%),
+        linear-gradient(135deg, rgba(79, 124, 255, 0.08), rgba(124, 58, 237, 0.08)),
+        rgba(10, 15, 26, 0.7),
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.75) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.75) 50%, transparent 50%);
+}
+
+.home-inline-select:focus {
+    border-color: rgba(79, 124, 255, 0.7);
+    box-shadow: 0 0 0 4px rgba(79, 124, 255, 0.14);
+    outline: none;
+}
+
+.home-inline-select::-ms-expand {
+    display: none;
+}
+
+.home-inline-field {
+    display: grid;
+    gap: 6px;
+    flex: 0 1 140px;
+    min-width: 120px;
+    max-width: 160px;
+}
+
+.home-inline-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.home-inline-actions .home-btn {
+    width: auto;
+}
+
+.home-inline-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.home-section-actions.stock-actions .home-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .form-title {
@@ -541,5 +636,10 @@
     .home-metrics-grid {
         grid-template-columns: 1fr;
     }
+
+    .home-section-actions.stock-actions {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
 }
+
 

@@ -7,5 +7,5 @@ public sealed class Stock
     public Product Product { get; set; } = null!;
     public Guid WareHouseId { get; set; }
     public WareHouse WareHouse { get; set; } = null!;
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
 }
