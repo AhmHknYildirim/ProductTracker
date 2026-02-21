@@ -64,6 +64,7 @@ export function PurchaseRequestsPage() {
     const [units, setUnits] = useState<UnitResponse[]>([]);
     const [openLinesId, setOpenLinesId] = useState<string | null>(null);
     const [openLinesRequest, setOpenLinesRequest] = useState<PurchaseRequestResponse | null>(null);
+    const [openActionsKey, setOpenActionsKey] = useState<string | null>(null);
     const [showCreate, setShowCreate] = useState(false);
     const [creating, setCreating] = useState(false);
     const [createRequestDate, setCreateRequestDate] = useState(
@@ -73,6 +74,21 @@ export function PurchaseRequestsPage() {
     const [lines, setLines] = useState<CreatePurchaseRequestLineRequest[]>([
         { productId: "", quantity: 1, unitId: "", requiredDate: null, notes: "" },
     ]);
+    const [activeTab, setActiveTab] = useState<"my-requests" | "approvals">("my-requests");
+    const [approvals, setApprovals] = useState<PurchaseRequestResponse[]>([]);
+    const [approvalsTotal, setApprovalsTotal] = useState(0);
+    const [approvalsLoading, setApprovalsLoading] = useState(false);
+
+    // Modal state for confirmation
+    const [confirmingApprove, setConfirmingApprove] = useState<PurchaseRequestResponse | null>(null);
+    const [confirmingReject, setConfirmingReject] = useState<PurchaseRequestResponse | null>(null);
+    const [confirmingCancel, setConfirmingCancel] = useState<PurchaseRequestResponse | null>(null);
+    const [confirmingSubmit, setConfirmingSubmit] = useState<{
+        id: string;
+        requestNumber?: string;
+    } | null>(null);
+    const [rejectionReason, setRejectionReason] = useState("");
+    const [cancelReason, setCancelReason] = useState("");
 
     useEffect(() => {
         function handleEsc(event: KeyboardEvent) {
@@ -127,6 +143,41 @@ export function PurchaseRequestsPage() {
         };
     }, [query, toast]);
 
+    async function loadApprovals(active: { value: boolean }) {
+        setApprovalsLoading(true);
+        try {
+            const res = await purchaseRequestsApi.list({
+                status: PurchaseRequestStatus.Submitted,
+                sort: "-createdAt",
+                page: 1,
+                pageSize: 50,
+            });
+            if (!active.value) return;
+            setApprovals(res.items);
+            setApprovalsTotal(res.total);
+        } catch (err) {
+            if (!active.value) return;
+            const typed = err as Error & { status?: number };
+            toast.pushToast({
+                message: typed.message || "Failed to load approval requests.",
+                status: typed.status ?? 500,
+            });
+        } finally {
+            if (!active.value) return;
+            setApprovalsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        const active = { value: true };
+        if (activeTab === "approvals") {
+            loadApprovals(active);
+        }
+        return () => {
+            active.value = false;
+        };
+    }, [activeTab, toast]);
+
     useEffect(() => {
         let active = true;
         productsApi
@@ -168,7 +219,13 @@ export function PurchaseRequestsPage() {
     }, [toast]);
 
     const gridStyle: CssVarStyle = {
-        "--table-cols": "minmax(160px, 2fr) 1.2fr 0.6fr 0.8fr 0.9fr 0.6fr",
+        "--table-cols":
+            "minmax(160px, 2fr) 1.1fr 0.5fr 0.8fr 0.9fr minmax(120px, 0.8fr)",
+    };
+
+    const approvalGridStyle: CssVarStyle = {
+        "--table-cols":
+            "minmax(160px, 2fr) 1.1fr 0.5fr 0.8fr 0.6fr minmax(130px, 0.8fr)",
     };
 
     function resetCreateForm() {
@@ -245,135 +302,420 @@ export function PurchaseRequestsPage() {
         }
     }
 
-    return (
-        // <section className="pr-page">
-        <section>
-            {/*<header className="pr-hero">*/}
-            {/*    <div className="pr-kpis">*/}
-            {/*        <div className="pr-kpi">*/}
-            {/*            <span className="label">Pending</span>*/}
-            {/*            <strong>{items.filter((x) => x.status === PurchaseRequestStatus.Submitted).length}</strong>*/}
-            {/*            <span className="trend">Submitted</span>*/}
-            {/*        </div>*/}
-            {/*        <div className="pr-kpi">*/}
-            {/*            <span className="label">Approved</span>*/}
-            {/*            <strong>{items.filter((x) => x.status === PurchaseRequestStatus.Approved).length}</strong>*/}
-            {/*            <span className="trend">In this page</span>*/}
-            {/*        </div>*/}
-            {/*        <div className="pr-kpi">*/}
-            {/*            <span className="label">Rejected</span>*/}
-            {/*            <strong>{items.filter((x) => x.status === PurchaseRequestStatus.Rejected).length}</strong>*/}
-            {/*            <span className="trend">In this page</span>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</header>*/}
+    async function handleApprove(id: string) {
+        try {
+            await purchaseRequestsApi.approve(id);
+            toast.pushToast({ status: 200, message: "Purchase request approved." });
+            const active = { value: true };
+            loadApprovals(active);
+            if (openLinesRequest?.id === id) {
+                setOpenLinesRequest(null);
+            }
+        } catch (err) {
+            const typed = err as Error & { status?: number };
+            toast.pushToast({
+                message: typed.message || "Failed to approve request.",
+                status: typed.status ?? 500,
+            });
+        }
+    }
 
-            <TableCard
-                title="Requests"
-                meta={`Showing ${items.length} of ${total} results`}
-                actions={
-                    <div className="pr-head-actions">
-                        <div className="pr-search">
-                            <input
-                                type="search"
-                                placeholder="Search by number or description"
-                                aria-label="Search purchase requests"
-                                value={search}
-                                onChange={(event) => setSearch(event.target.value)}
-                            />
-                            <span>
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M11 2a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 2a7 7 0 1 0 4.47 12.39l4.07 4.07 1.41-1.41-4.07-4.07A7 7 0 0 0 11 4Z" />
-                                </svg>
-                            </span>
-                        </div>
-                        <div className="pr-filters">
-                            <select
-                                aria-label="Status"
-                                value={status}
-                                onChange={(event) =>
-                                    setStatus(
-                                        event.target.value === ""
-                                            ? ""
-                                            : Number(event.target.value) as PurchaseRequestStatus
-                                    )
-                                }
-                            >
-                                <option value="">All statuses</option>
-                                <option value={PurchaseRequestStatus.Draft}>Draft</option>
-                                <option value={PurchaseRequestStatus.Submitted}>Submitted</option>
-                                <option value={PurchaseRequestStatus.Approved}>Approved</option>
-                                <option value={PurchaseRequestStatus.Rejected}>Rejected</option>
-                                <option value={PurchaseRequestStatus.Cancelled}>Cancelled</option>
-                            </select>
-                            <select
-                                aria-label="Date range"
-                                value={range}
-                                onChange={(event) => setRange(event.target.value as DateRangeKey)}
-                            >
-                                <option value="">Any date</option>
-                                <option value="7">Last 7 days</option>
-                                <option value="30">Last 30 days</option>
-                                <option value="90">Last 90 days</option>
-                            </select>
-                        </div>
-                        <button type="button" className="wh-btn primary" onClick={() => setShowCreate(true)}>
-                            New Request
-                        </button>
-                    </div>
-                }
+    async function handleReject(id: string, reason: string) {
+        try {
+            await purchaseRequestsApi.reject(id, reason);
+            toast.pushToast({ status: 200, message: "Purchase request rejected." });
+            const active = { value: true };
+            loadApprovals(active);
+            if (openLinesRequest?.id === id) {
+                setOpenLinesRequest(null);
+            }
+        } catch (err) {
+            const typed = err as Error & { status?: number };
+            toast.pushToast({
+                message: typed.message || "Failed to reject request.",
+                status: typed.status ?? 500,
+            });
+        }
+    }
+
+    async function handleCancel(id: string) {
+        try {
+            await purchaseRequestsApi.cancel(id);
+            toast.pushToast({ status: 200, message: "Purchase request cancelled." });
+            const active = { value: true };
+            loadRequests(active);
+            if (openLinesRequest?.id === id) {
+                setOpenLinesRequest(null);
+            }
+        } catch (err) {
+            const typed = err as Error & { status?: number };
+            toast.pushToast({
+                message: typed.message || "Failed to cancel request.",
+                status: typed.status ?? 500,
+            });
+        }
+    }
+
+    function openSubmitConfirm(id: string) {
+        const match =
+            items.find((item) => item.id === id) ??
+            (openLinesRequest?.id === id ? openLinesRequest : null);
+        setConfirmingSubmit({ id, requestNumber: match?.requestNumber });
+    }
+
+    async function handleSubmit(id: string) {
+        try {
+            await purchaseRequestsApi.submit(id);
+            toast.pushToast({ status: 200, message: "Purchase request submitted." });
+            const active = { value: true };
+            loadRequests(active);
+        } catch (err) {
+            const typed = err as Error & { status?: number };
+            toast.pushToast({
+                message: typed.message || "Failed to submit request.",
+                status: typed.status ?? 500,
+            });
+        }
+    }
+
+    function handleDraftActionChange(row: PurchaseRequestResponse, action: string) {
+        setOpenActionsKey(null);
+        if (action === "submit") {
+            openSubmitConfirm(row.id);
+            return;
+        }
+        if (action === "update") {
+            toast.pushToast({ status: 400, message: "Update flow is not available yet." });
+        }
+    }
+
+    const tabs = (
+        <div className="pr-tabs">
+            <button
+                className={`tab-btn ${activeTab === "my-requests" ? "active" : ""}`}
+                onClick={() => setActiveTab("my-requests")}
             >
-                <div className="table-grid table-grid-head" style={gridStyle as CSSProperties}>
-                    <span>Request</span>
-                    <span>Requester</span>
-                    <span>Lines</span>
-                    <span>Date</span>
-                    <span>Status</span>
-                    <span></span>
-                </div>
-                {loading && (
-                    <div className="table-grid table-grid-row table-grid-empty" style={gridStyle as CSSProperties}>
-                        <div className="pr-subtext">Loading...</div>
-                    </div>
-                )}
-                {!loading && items.length === 0 && (
-                    <div className="table-grid table-grid-row table-grid-empty" style={gridStyle as CSSProperties}>
-                        <div className="pr-subtext">No purchase requests found.</div>
-                    </div>
-                )}
-                {!loading &&
-                    items.map((row) => (
-                        <div key={row.id} className="table-grid table-grid-row" style={gridStyle as CSSProperties}>
-                            <div>
-                                <div className="pr-number">{row.requestNumber}</div>
-                                <div className="pr-subtext">{row.description ?? "-"}</div>
-                            </div>
-                            <div className="pr-subtext">{row.requestedByUserId.slice(0, 8)}...</div>
-                            <div className={`pr-lines-cell ${openLinesId === row.id ? "open" : ""}`}>
-                                <button
-                                    type="button"
-                                    className="pr-lines-trigger"
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        setOpenLinesId((prev) => (prev === row.id ? null : row.id));
-                                        setOpenLinesRequest(row);
-                                    }}
-                                >
-                                    {row.lines.length}
-                                </button>
-                            </div>
-                            <div>{formatDate(row.requestDate)}</div>
-                            <div className={STATUS_TONE[row.status]}>
-                                {STATUS_LABELS[row.status]}
-                            </div>
-                            <div>
-                                <button type="button" className="pr-link">
-                                    Edit
-                                </button>
-                            </div>
+                My Requests
+            </button>
+            <button
+                className={`tab-btn ${activeTab === "approvals" ? "active" : ""}`}
+                onClick={() => setActiveTab("approvals")}
+            >
+                Waiting for Approval
+            </button>
+        </div>
+    );
+
+    return (
+        <section>
+            {activeTab === "my-requests" && (
+                <TableCard
+                    title={
+                        <div className="pr-card-title">
+                            {tabs}
+                            <div className="pr-card-label">Requests</div>
                         </div>
-                    ))}
-            </TableCard>
+                    }
+                    className="pr-table-center"
+                    meta={`Showing ${items.length} of ${total} results`}
+                    actions={
+                        <div className="pr-head-actions">
+                            <div className="pr-search">
+                                <input
+                                    type="search"
+                                    placeholder="Search by number or description"
+                                    aria-label="Search purchase requests"
+                                    value={search}
+                                    onChange={(event) => setSearch(event.target.value)}
+                                />
+                                <span>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M11 2a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 2a7 7 0 1 0 4.47 12.39l4.07 4.07 1.41-1.41-4.07-4.07A7 7 0 0 0 11 4Z" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <div className="pr-filters">
+                                <select
+                                    aria-label="Status"
+                                    value={status}
+                                    onChange={(event) =>
+                                        setStatus(
+                                            event.target.value === ""
+                                                ? ""
+                                                : Number(event.target.value) as PurchaseRequestStatus
+                                        )
+                                    }
+                                >
+                                    <option value="">All statuses</option>
+                                    <option value={PurchaseRequestStatus.Draft}>Draft</option>
+                                    <option value={PurchaseRequestStatus.Submitted}>Submitted</option>
+                                    <option value={PurchaseRequestStatus.Approved}>Approved</option>
+                                    <option value={PurchaseRequestStatus.Rejected}>Rejected</option>
+                                    <option value={PurchaseRequestStatus.Cancelled}>Cancelled</option>
+                                </select>
+                                <select
+                                    aria-label="Date range"
+                                    value={range}
+                                    onChange={(event) => setRange(event.target.value as DateRangeKey)}
+                                >
+                                    <option value="">Any date</option>
+                                    <option value="7">Last 7 days</option>
+                                    <option value="30">Last 30 days</option>
+                                    <option value="90">Last 90 days</option>
+                                </select>
+                            </div>
+                            <button
+                                type="button"
+                                className="wh-btn primary"
+                                onClick={() => setShowCreate(true)}
+                            >
+                                Add Request
+                            </button>
+                        </div>
+                    }
+                >
+                    <div className="table-grid table-grid-head" style={gridStyle as CSSProperties}>
+                        <span>Request</span>
+                        <span>Requester</span>
+                        <span>Lines</span>
+                        <span>Date</span>
+                        <span>Status</span>
+                        <span className="table-grid-right">Actions</span>
+                    </div>
+                    {loading && (
+                        <div
+                            className="table-grid table-grid-row table-grid-empty"
+                            style={gridStyle as CSSProperties}
+                        >
+                            <div className="pr-subtext">Loading...</div>
+                        </div>
+                    )}
+                    {!loading && items.length === 0 && (
+                        <div
+                            className="table-grid table-grid-row table-grid-empty"
+                            style={gridStyle as CSSProperties}
+                        >
+                            <div className="pr-subtext">No purchase requests found.</div>
+                        </div>
+                    )}
+                    {!loading &&
+                        items.map((row) => (
+                            <div
+                                key={row.id}
+                                className="table-grid table-grid-row"
+                                style={gridStyle as CSSProperties}
+                            >
+                                <div>
+                                    <div className="pr-number">{row.requestNumber}</div>
+                                    <div className="pr-subtext">{row.description ?? "-"}</div>
+                                </div>
+                                <div className="pr-subtext">
+                                    {row.requestedByUserName?.trim()
+                                        ? row.requestedByUserName
+                                        : `${row.requestedByUserId.slice(0, 8)}...`}
+                                </div>
+                                <div className={`pr-lines-cell ${openLinesId === row.id ? "open" : ""}`}>
+                                    <button
+                                        type="button"
+                                        className="pr-lines-trigger"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            setOpenLinesId((prev) => (prev === row.id ? null : row.id));
+                                            setOpenLinesRequest(row);
+                                        }}
+                                    >
+                                        {row.lines.length}
+                                    </button>
+                                </div>
+                                <div>{formatDate(row.requestDate)}</div>
+                                <div className={STATUS_TONE[row.status]}>
+                                    {STATUS_LABELS[row.status]}
+                                </div>
+                                <div className="table-grid-right">
+                                    {(row.status === PurchaseRequestStatus.Draft ||
+                                        row.status === PurchaseRequestStatus.Submitted) && (
+                                        <div className="pr-actions-cell">
+                                            <button
+                                                type="button"
+                                                className="pr-actions-trigger"
+                                                onClick={() =>
+                                                    setOpenActionsKey((current) =>
+                                                        current === `my-${row.id}` ? null : `my-${row.id}`
+                                                    )
+                                                }
+                                            >
+                                                Actions
+                                            </button>
+                                            {openActionsKey === `my-${row.id}` && (
+                                                <div className="pr-actions-menu">
+                                                    {row.status === PurchaseRequestStatus.Draft && (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                className="pr-actions-item"
+                                                                onClick={() =>
+                                                                    handleDraftActionChange(row, "submit")
+                                                                }
+                                                            >
+                                                                Submit
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="pr-actions-item"
+                                                                onClick={() =>
+                                                                    handleDraftActionChange(row, "update")
+                                                                }
+                                                            >
+                                                                Update
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    {row.status === PurchaseRequestStatus.Submitted && (
+                                                        <button
+                                                            type="button"
+                                                            className="pr-actions-item danger"
+                                                            onClick={() => {
+                                                                setOpenActionsKey(null);
+                                                                setConfirmingCancel(row);
+                                                            }}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                </TableCard>
+            )}
+
+            {activeTab === "approvals" && (
+                <TableCard
+                    title={
+                        <div className="pr-card-title">
+                            {tabs}
+                            <div className="pr-card-label">Approvals</div>
+                        </div>
+                    }
+                    className="pr-table-center"
+                    meta={`Showing ${approvals.length} of ${approvalsTotal} results`}
+                >
+                    <div
+                        className="table-grid table-grid-head"
+                        style={approvalGridStyle as CSSProperties}
+                    >
+                        <span>Request</span>
+                        <span>Requester</span>
+                        <span>Lines</span>
+                        <span>Date</span>
+                        <span>Status</span>
+                        <span className="table-grid-right">Actions</span>
+                    </div>
+                    {approvalsLoading && (
+                        <div
+                            className="table-grid table-grid-row table-grid-empty"
+                            style={approvalGridStyle as CSSProperties}
+                        >
+                            <div className="pr-subtext">Loading...</div>
+                        </div>
+                    )}
+                    {!approvalsLoading && approvals.length === 0 && (
+                        <div
+                            className="table-grid table-grid-row table-grid-empty"
+                            style={approvalGridStyle as CSSProperties}
+                        >
+                            <div className="pr-subtext">No pending approvals found.</div>
+                        </div>
+                    )}
+                    {!approvalsLoading &&
+                        approvals.map((row) => (
+                            <div
+                                key={row.id}
+                                className="table-grid table-grid-row"
+                                style={approvalGridStyle as CSSProperties}
+                            >
+                                <div>
+                                    <div className="pr-number">{row.requestNumber}</div>
+                                    <div className="pr-subtext">{row.description ?? "-"}</div>
+                                </div>
+                                <div className="pr-subtext">
+                                    {row.requestedByUserName?.trim()
+                                        ? row.requestedByUserName
+                                        : `${row.requestedByUserId.slice(0, 8)}...`}
+                                </div>
+                                <div className={`pr-lines-cell ${openLinesId === row.id ? "open" : ""}`}>
+                                    <button
+                                        type="button"
+                                        className="pr-lines-trigger"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            setOpenLinesId((prev) => (prev === row.id ? null : row.id));
+                                            setOpenLinesRequest(row);
+                                        }}
+                                    >
+                                        {row.lines.length}
+                                    </button>
+                                </div>
+                                <div>{formatDate(row.requestDate)}</div>
+                                <div className={STATUS_TONE[row.status]}>
+                                    {STATUS_LABELS[row.status]}
+                                </div>
+                                <div className="table-grid-right">
+                                    <div className="pr-actions-cell">
+                                        <button
+                                            type="button"
+                                            className="pr-actions-trigger"
+                                            onClick={() =>
+                                                setOpenActionsKey((current) =>
+                                                    current === `ap-${row.id}` ? null : `ap-${row.id}`
+                                                )
+                                            }
+                                        >
+                                            Actions
+                                        </button>
+                                        {openActionsKey === `ap-${row.id}` && (
+                                            <div className="pr-actions-menu">
+                                                <button
+                                                    type="button"
+                                                    className="pr-actions-item"
+                                                    onClick={() => {
+                                                        setOpenActionsKey(null);
+                                                        setConfirmingApprove(row);
+                                                    }}
+                                                >
+                                                    Approve
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="pr-actions-item danger"
+                                                    onClick={() => {
+                                                        setOpenActionsKey(null);
+                                                        setConfirmingReject(row);
+                                                    }}
+                                                >
+                                                    Reject
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="pr-actions-item warning"
+                                                    onClick={() => {
+                                                        setOpenActionsKey(null);
+                                                        setConfirmingCancel(row);
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                </TableCard>
+            )}
 
             {showCreate && (
                 <div className="modal-overlay" onClick={() => setShowCreate(false)}>
@@ -631,6 +973,213 @@ export function PurchaseRequestsPage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                        {openLinesRequest.status === PurchaseRequestStatus.Submitted && activeTab === "approvals" && (
+                            <div className="form-actions">
+                                <button
+                                    type="button"
+                                    className="wh-btn primary"
+                                    onClick={() => setConfirmingApprove(openLinesRequest)}
+                                >
+                                    Approve
+                                </button>
+                                <button
+                                    type="button"
+                                    className="wh-btn danger"
+                                    onClick={() => setConfirmingReject(openLinesRequest)}
+                                >
+                                    Reject
+                                </button>
+                            </div>
+                        )}
+                        {openLinesRequest.status === PurchaseRequestStatus.Draft && activeTab === "my-requests" && (
+                            <div className="form-actions">
+                                <button
+                                    type="button"
+                                    className="wh-btn primary"
+                                    onClick={() => openSubmitConfirm(openLinesRequest.id)}
+                                >
+                                    Submit Request
+                                </button>
+                            </div>
+                        )}
+                        {openLinesRequest.status === PurchaseRequestStatus.Submitted &&
+                            activeTab === "my-requests" && (
+                                <div className="form-actions">
+                                    <button
+                                        type="button"
+                                        className="wh-btn danger"
+                                        onClick={() => setConfirmingCancel(openLinesRequest)}
+                                    >
+                                        Cancel Request
+                                    </button>
+                                </div>
+                            )}
+                    </div>
+                </div>
+            )}
+
+            {confirmingApprove && (
+                <div className="modal-overlay" onClick={() => setConfirmingApprove(null)}>
+                    <div className="modal-card mini-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-head">
+                            <div className="form-title">Approve Request</div>
+                        </div>
+                        <div className="modal-body">
+                            <p>Are you sure you want to approve request <strong>{confirmingApprove.requestNumber}</strong>?</p>
+                        </div>
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="wh-btn primary"
+                                onClick={() => {
+                                    handleApprove(confirmingApprove.id);
+                                    setConfirmingApprove(null);
+                                }}
+                            >
+                                Yes, Approve
+                            </button>
+                            <button
+                                type="button"
+                                className="wh-btn ghost"
+                                onClick={() => setConfirmingApprove(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmingReject && (
+                <div className="modal-overlay" onClick={() => setConfirmingReject(null)}>
+                    <div className="modal-card mini-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-head">
+                            <div className="form-title">Reject Request</div>
+                        </div>
+                        <div className="modal-body stack">
+                            <p>Are you sure you want to reject request <strong>{confirmingReject.requestNumber}</strong>?</p>
+                            <div className="field">
+                                <label>Rejection Reason</label>
+                                <textarea
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Please enter why this request is being rejected..."
+                                    rows={3}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="wh-btn danger"
+                                onClick={() => {
+                                    if (!rejectionReason.trim()) {
+                                        toast.pushToast({ status: 400, message: "Reason is required." });
+                                        return;
+                                    }
+                                    handleReject(confirmingReject.id, rejectionReason);
+                                    setConfirmingReject(null);
+                                    setRejectionReason("");
+                                }}
+                            >
+                                Reject
+                            </button>
+                            <button
+                                type="button"
+                                className="wh-btn ghost"
+                                onClick={() => {
+                                    setConfirmingReject(null);
+                                    setRejectionReason("");
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmingCancel && (
+                <div className="modal-overlay" onClick={() => setConfirmingCancel(null)}>
+                    <div className="modal-card mini-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-head">
+                            <div className="form-title">Cancel Request</div>
+                        </div>
+                        <div className="modal-body stack">
+                            <p>
+                                Are you sure you want to cancel request{" "}
+                                <strong>{confirmingCancel.requestNumber}</strong>?
+                            </p>
+                            <div className="field">
+                                <label>Cancel Reason</label>
+                                <textarea
+                                    value={cancelReason}
+                                    onChange={(e) => setCancelReason(e.target.value)}
+                                    placeholder="Optional reason for cancellation"
+                                    rows={3}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="wh-btn danger"
+                                onClick={() => {
+                                    handleCancel(confirmingCancel.id);
+                                    setConfirmingCancel(null);
+                                    setCancelReason("");
+                                }}
+                            >
+                                Cancel Request
+                            </button>
+                            <button
+                                type="button"
+                                className="wh-btn ghost"
+                                onClick={() => {
+                                    setConfirmingCancel(null);
+                                    setCancelReason("");
+                                }}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmingSubmit && (
+                <div className="modal-overlay" onClick={() => setConfirmingSubmit(null)}>
+                    <div className="modal-card mini-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-head">
+                            <div className="form-title">Submit Request</div>
+                        </div>
+                        <div className="modal-body">
+                            <p>
+                                Are you sure you want to submit request{" "}
+                                <strong>{confirmingSubmit.requestNumber ?? "-"}</strong>?
+                            </p>
+                        </div>
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="wh-btn primary"
+                                onClick={() => {
+                                    handleSubmit(confirmingSubmit.id);
+                                    setConfirmingSubmit(null);
+                                }}
+                            >
+                                Yes, Submit
+                            </button>
+                            <button
+                                type="button"
+                                className="wh-btn ghost"
+                                onClick={() => setConfirmingSubmit(null)}
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>

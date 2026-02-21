@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { productsApi } from "../../../api/products.api";
 import { stocksApi } from "../../../api/stocks.api";
@@ -36,6 +36,7 @@ export function WareHousesPage() {
     const [stockQty, setStockQty] = useState("0");
     const [stockWarehouseFilter, setStockWarehouseFilter] = useState("");
     const [stockProductFilter, setStockProductFilter] = useState("");
+    const [openActionsKey, setOpenActionsKey] = useState<string | null>(null);
 
     const [confirmState, setConfirmState] = useState<{
         open: boolean;
@@ -347,7 +348,8 @@ export function WareHousesPage() {
         <>
             <TableCard
                 title="WareHouses"
-                meta={loading ? "Loading..." : `${warehouses.length} warehouses � ${stocks.length} stocks`}
+                meta={loading ? "Loading..." : `${warehouses.length} warehouses • ${stocks.length} stocks`}
+                className="wh-table-center"
                 actions={
                     <button className="wh-btn primary" type="button" onClick={openWarehouseCreate}>
                         Add Warehouse
@@ -366,13 +368,44 @@ export function WareHousesPage() {
                     warehouses.map((warehouse) => (
                         <div key={warehouse.id} className="table-grid table-grid-row" style={warehouseGrid as CSSProperties}>
                             <div className="table-grid-strong">{warehouse.name}</div>
-                            <div className="table-grid-right wh-actions">
-                                <button className="wh-btn ghost" type="button" onClick={() => openWarehouseEdit(warehouse)}>
-                                    Edit
-                                </button>
-                                <button className="wh-btn danger" type="button" onClick={() => handleWarehouseDelete(warehouse.id)}>
-                                    Delete
-                                </button>
+                            <div className="table-grid-right">
+                                <div className="wh-actions-cell">
+                                    <button
+                                        className="wh-actions-trigger"
+                                        type="button"
+                                        onClick={() =>
+                                            setOpenActionsKey((current) =>
+                                                current === `wh-${warehouse.id}` ? null : `wh-${warehouse.id}`
+                                            )
+                                        }
+                                    >
+                                        Actions
+                                    </button>
+                                    {openActionsKey === `wh-${warehouse.id}` && (
+                                        <div className="wh-actions-menu">
+                                            <button
+                                                className="wh-actions-item"
+                                                type="button"
+                                                onClick={() => {
+                                                    setOpenActionsKey(null);
+                                                    openWarehouseEdit(warehouse);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="wh-actions-item danger"
+                                                type="button"
+                                                onClick={() => {
+                                                    setOpenActionsKey(null);
+                                                    handleWarehouseDelete(warehouse.id);
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))
@@ -383,6 +416,7 @@ export function WareHousesPage() {
 
             <TableCard
                 title="Stock"
+                className="wh-table-center"
                 actions={
                     <div className="wh-actions">
                         <button
@@ -439,7 +473,7 @@ export function WareHousesPage() {
                     <span>Product</span>
                     <span>SKU</span>
                     <span className="table-grid-right">Qty</span>
-                    <span>Actions</span>
+                    <span className="table-grid-right">Actions</span>
                 </div>
 
                 {filteredStocks.length === 0 ? (
@@ -453,13 +487,44 @@ export function WareHousesPage() {
                             <div>{stock.productName}</div>
                             <div className="table-grid-muted">{stock.productSku ?? "-"}</div>
                             <div className="table-grid-right">{stock.quantity}</div>
-                            <div className="wh-actions">
-                                <button className="wh-btn ghost" type="button" onClick={() => openStockEdit(stock)}>
-                                    Edit
-                                </button>
-                                <button className="wh-btn danger" type="button" onClick={() => handleStockDelete(stock.id)}>
-                                    Delete
-                                </button>
+                            <div className="table-grid-right">
+                                <div className="wh-actions-cell">
+                                    <button
+                                        className="wh-actions-trigger"
+                                        type="button"
+                                        onClick={() =>
+                                            setOpenActionsKey((current) =>
+                                                current === `st-${stock.id}` ? null : `st-${stock.id}`
+                                            )
+                                        }
+                                    >
+                                        Actions
+                                    </button>
+                                    {openActionsKey === `st-${stock.id}` && (
+                                        <div className="wh-actions-menu">
+                                            <button
+                                                className="wh-actions-item"
+                                                type="button"
+                                                onClick={() => {
+                                                    setOpenActionsKey(null);
+                                                    openStockEdit(stock);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="wh-actions-item danger"
+                                                type="button"
+                                                onClick={() => {
+                                                    setOpenActionsKey(null);
+                                                    handleStockDelete(stock.id);
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))
@@ -665,5 +730,6 @@ export function WareHousesPage() {
         </>
     );
 }
+
 
 

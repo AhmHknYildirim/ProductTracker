@@ -7,6 +7,7 @@ public sealed class PurchaseRequestResponse
     public Guid Id { get; set; }
     public string RequestNumber { get; set; } = default!;
     public Guid RequestedByUserId { get; set; }
+    public string? RequestedByUserName { get; set; }
     public DateTime RequestDate { get; set; }
     public PurchaseRequestStatus Status { get; set; }
     public string? Description { get; set; }

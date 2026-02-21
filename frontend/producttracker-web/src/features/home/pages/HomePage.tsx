@@ -14,7 +14,7 @@ export function HomePage() {
     const [sku, setSku] = useState("");
     const [minQty, setMinQty] = useState<string>("");
     const [maxQty, setMaxQty] = useState<string>("");
-    const [sort, setSort] = useState<ListProductsQuery["sort"]>("name_asc");
+    const [sort] = useState<ListProductsQuery["sort"]>("name_asc");
     const [statusFilter, setStatusFilter] = useState<"all" | ProductStatusKind>("all");
 
     // Data state
@@ -118,22 +118,6 @@ export function HomePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    function applyFilters() {
-        setPage(1);
-        setTimeout(() => load(), 0);
-    }
-
-    function resetFilters() {
-        setQ("");
-        setSku("");
-        setMinQty("");
-        setMaxQty("");
-        setSort("name_asc");
-        setStatusFilter("all");
-        setPage(1);
-        setPageSize(10);
-        setTimeout(() => load(), 0);
-    }
 
     function startEdit(p: ProductResponse) {
         setEditId(p.id);
@@ -335,9 +319,19 @@ export function HomePage() {
         <>
             <div className="home-panel">
                 <div className="home-panel-head">
-                    <div className="home-panel-title">Products</div>
-                    <div className="home-panel-meta">
-                        {loading ? "Loading..." : `${total} total`}
+                    <div className="home-panel-title">Products
+                        <div className="home-panel-meta">
+                            {loading ? "Loading..." : `${total} total`}
+                        </div>
+                    </div>
+                    <div className="home-tableactions">
+                        <button
+                            type="button"
+                            className="wh-btn primary"
+                            onClick={() => setShowCreate(true)}
+                        >
+                            Add Products
+                        </button>
                     </div>
                 </div>
 
@@ -407,25 +401,8 @@ export function HomePage() {
                                 <option value={ProductStatusKind.Archived}>Archived</option>
                             </select>
                         </div>
-                        <div className="field">
-                            <label>Actions</label>
-                            <div className="home-filter-actions">
-                                <button className="home-btn" type="button" onClick={applyFilters} disabled={loading}>
-                                    Apply
-                                </button>
-                                <button className="home-btn ghost" type="button" onClick={resetFilters} disabled={loading}>
-                                    Reset
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
-
-                    <div className="home-tableactions">
-                        <button className="home-btn" type="button" onClick={() => setShowCreate(true)}>
-                            +
-                        </button>
-                    </div>
                     <table className="home-table">
                         <thead>
                         <tr>

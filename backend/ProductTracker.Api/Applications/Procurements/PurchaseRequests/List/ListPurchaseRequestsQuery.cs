@@ -7,6 +7,7 @@ public sealed class ListPurchaseRequestsQuery
     public string? Q { get; set; }
     public PurchaseRequestStatus? Status { get; set; }
     public Guid? RequestedByUserId { get; set; }
+    public string? UserName { get; set; }
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
 

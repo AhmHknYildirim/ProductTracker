@@ -59,4 +59,16 @@ export const purchaseRequestsApi = {
 
     create: (payload: CreatePurchaseRequestRequest) =>
         postWithFallback<PurchaseRequestResponse>(PRIMARY_BASE, payload),
+
+    approve: (id: string) =>
+        postWithFallback<PurchaseRequestResponse>(`${PRIMARY_BASE}/${id}/approve`, {}),
+
+    reject: (id: string, rejectionReason: string) =>
+        postWithFallback<PurchaseRequestResponse>(`${PRIMARY_BASE}/${id}/reject`, { rejectionReason }),
+
+    cancel: (id: string, cancelReason: string) =>
+        postWithFallback<PurchaseRequestResponse>(`${PRIMARY_BASE}/${id}/cancel`, { cancelReason }),
+
+    submit: (id: string) =>
+        postWithFallback<PurchaseRequestResponse>(`${PRIMARY_BASE}/${id}/submit`, {}),
 };

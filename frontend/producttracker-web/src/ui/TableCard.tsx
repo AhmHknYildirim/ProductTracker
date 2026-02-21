@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import "./table-card.css";
 
 type TableCardProps = {
-    title: string;
-    meta?: string;
+    title: ReactNode;
+    meta?: ReactNode;
     actions?: ReactNode;
     children: ReactNode;
     className?: string;

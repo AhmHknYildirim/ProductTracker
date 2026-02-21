@@ -10,6 +10,7 @@ public static class PurchaseRequestResponseMapper
             Id = entity.Id,
             RequestNumber = entity.RequestNumber,
             RequestedByUserId = entity.RequestedByUserId,
+            RequestedByUserName = entity.RequestedByUser?.UserName,
             RequestDate = entity.RequestDate,
             Status = entity.Status,
             Description = entity.Description,

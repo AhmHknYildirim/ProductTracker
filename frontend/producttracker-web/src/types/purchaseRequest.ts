@@ -24,6 +24,7 @@ export type PurchaseRequestResponse = {
     id: string;
     requestNumber: string;
     requestedByUserId: string;
+    requestedByUserName?: string | null;
     requestDate: string;
     status: PurchaseRequestStatus;
     description: string | null;

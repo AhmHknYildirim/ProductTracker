@@ -34,6 +34,7 @@ public sealed class ListPurchaseRequestsHandler
             .ThenInclude(l => l.Product)
             .Include(x => x.Lines)
             .ThenInclude(l => l.Unit)
+            .Include(x => x.RequestedByUser)
             .AsQueryable();
 
         if (query.Status is not null)
@@ -41,6 +42,12 @@ public sealed class ListPurchaseRequestsHandler
 
         if (query.RequestedByUserId is not null)
             q = q.Where(x => x.RequestedByUserId == query.RequestedByUserId.Value);
+
+        if (!string.IsNullOrWhiteSpace(query.UserName))
+        {
+            var userName = query.UserName.Trim();
+            q = q.Where(x => x.RequestedByUser.UserName.Contains(userName));
+        }
 
         var fromDateUtc = AsUtc(query.FromDate);
         var toDateUtc = AsUtc(query.ToDate);

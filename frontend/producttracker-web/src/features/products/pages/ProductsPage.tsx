@@ -24,6 +24,7 @@ export function ProductsPage() {
     const [editSku, setEditSku] = useState("");
     const [editRevision, setEditRevision] = useState("");
     const [editQuantity, setEditQuantity] = useState(0);
+    const [openActionsId, setOpenActionsId] = useState<string | null>(null);
 
     const query: ListProductsQuery = useMemo(
         () => ({
@@ -284,17 +285,43 @@ export function ProductsPage() {
                                     {new Date(p.createdAt).toLocaleString()}
                                 </div>
                                 <div>
-                                    <select
-                                        className="prod-select"
-                                        value=""
-                                        onChange={(e) => handleActionChange(p.id, e.target.value, p)}
-                                    >
-                                        <option value="" disabled>
-                                            Seciniz
-                                        </option>
-                                        <option value="update">Guncelle</option>
-                                        <option value="delete">Sil</option>
-                                    </select>
+                                    <div className="prod-actions-cell">
+                                        <button
+                                            type="button"
+                                            className="prod-actions-trigger"
+                                            onClick={() =>
+                                                setOpenActionsId((current) =>
+                                                    current === p.id ? null : p.id
+                                                )
+                                            }
+                                        >
+                                            Actions
+                                        </button>
+                                        {openActionsId === p.id && (
+                                            <div className="prod-actions-menu">
+                                                <button
+                                                    type="button"
+                                                    className="prod-actions-item"
+                                                    onClick={() => {
+                                                        setOpenActionsId(null);
+                                                        handleActionChange(p.id, "update", p);
+                                                    }}
+                                                >
+                                                    Update
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="prod-actions-item danger"
+                                                    onClick={() => {
+                                                        setOpenActionsId(null);
+                                                        handleActionChange(p.id, "delete", p);
+                                                    }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )

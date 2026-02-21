@@ -2,7 +2,7 @@
 
 .pr-page {
     min-height: 100%;
-    padding: 36px clamp(20px, 3vw, 48px) 64px;
+    padding: 24px clamp(16px, 2.4vw, 40px) 48px;
     background: radial-gradient(circle at 10% 10%, rgba(47, 125, 209, 0.08), transparent 60%),
         radial-gradient(circle at 90% 20%, rgba(46, 132, 98, 0.08), transparent 60%),
         linear-gradient(135deg, #ffffff 0%, #f6f7fb 55%, #f8fafc 100%);
@@ -105,8 +105,8 @@
 
 .pr-search input {
     width: 100%;
-    padding: 12px 44px 12px 16px;
-    border-radius: 16px;
+    padding: 10px 40px 10px 14px;
+    border-radius: 14px;
     border: 1px solid #c8d1d8;
     background: rgba(255, 255, 255, 0.7);
     font-family: inherit;
@@ -130,17 +130,17 @@
 
 .pr-filters {
     display: grid;
-    grid-template-columns: repeat(2, 140px);
-    gap: 12px;
+    grid-template-columns: repeat(2, 120px);
+    gap: 10px;
 }
 
 .pr-filters select {
-    border-radius: 14px;
+    border-radius: 12px;
     border: 1px solid #c8d1d8;
-    padding: 10px 14px;
+    padding: 8px 12px;
     font-family: inherit;
     background: #ffffff;
-    width: 140px;
+    width: 120px;
 }
 
 
@@ -154,9 +154,9 @@
 }
 
 .chip {
-    padding: 6px 12px;
+    padding: 4px 10px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     display: inline-flex;
     justify-content: center;
@@ -193,6 +193,13 @@
     color: #1f5fa0;
     font-weight: 600;
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.pr-link:hover {
+    background: rgba(31, 95, 160, 0.08);
 }
 
 .pr-lines-cell {
@@ -208,11 +215,12 @@
     color: #1f2a37;
     font-weight: 700;
     border-radius: 999px;
-    padding: 4px 12px;
+    padding: 3px 10px;
     cursor: pointer;
     font-family: inherit;
-    min-width: 36px;
+    min-width: 30px;
     text-align: center;
+    font-size: 12px;
 }
 
 .pr-lines-empty {
@@ -255,9 +263,85 @@
 .pr-head-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
     justify-content: flex-end;
+}
+
+.pr-actions-cell {
+    position: relative;
+    display: inline-flex;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.pr-table-center .table-grid-head,
+.pr-table-center .table-grid-row {
+    text-align: center;
+}
+
+.pr-table-center .table-grid-right {
+    text-align: center;
+}
+
+.pr-table-center .pr-actions-cell {
+    justify-content: center;
+}
+
+.pr-table-center .pr-lines-cell {
+    justify-content: center;
+}
+
+.pr-actions-trigger {
+    min-width: 92px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #d5dde5;
+    background: #ffffff;
+    color: #1c232b;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.pr-actions-trigger:focus {
+    border-color: rgba(47, 111, 178, 0.7);
+    box-shadow: 0 0 0 4px rgba(47, 111, 178, 0.14);
+}
+
+.pr-actions-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: grid;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid #e3e7ee;
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(17, 24, 39, 0.12);
+    z-index: 5;
+    min-width: 120px;
+}
+
+.pr-actions-item {
+    border: none;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    color: #ffffff;
+    background: #2f6fb2;
+}
+
+.pr-actions-item.danger {
+    background: #d64545;
 }
 
 .pr-lines {
@@ -469,4 +553,117 @@
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+}
+
+.pr-card-title {
+    display: grid;
+    gap: 8px;
+}
+
+.pr-card-label {
+    font-size: 16px;
+    font-weight: 900;
+    color: #111827;
+}
+
+.pr-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #e3e7ee;
+    padding-bottom: 6px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 2px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    position: relative;
+    font-family: inherit;
+}
+
+.tab-btn.active {
+    color: #1f5fa0;
+}
+
+.tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #1f5fa0;
+}
+
+.action-btns {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pr-actions-select {
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid #c8d1d8;
+    background: #ffffff;
+    font-family: inherit;
+    color: #1c232b;
+}
+
+.pr-page .table-card-head {
+    padding: 12px 16px 10px 16px;
+}
+
+.pr-page .table-card-body {
+    padding: 10px 14px 14px 14px;
+}
+
+.pr-page .table-grid-head {
+    padding: 10px 14px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+}
+
+.pr-page .table-grid-row {
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.pr-page .table-grid-row + .table-grid-row {
+    margin-top: 8px;
+}
+
+.pr-page .wh-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+
+.mini-modal {
+    width: min(440px, calc(100vw - 32px)) !important;
+}
+
+.mini-modal .modal-body {
+    padding: 24px 20px;
+}
+
+.mini-modal .field {
+    width: 100%;
+}
+
+.mini-modal textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e3e7ee;
+    background: #ffffff;
+    color: #111111;
+    font-family: inherit;
+    resize: vertical;
 }
